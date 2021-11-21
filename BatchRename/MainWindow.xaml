@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:BatchRename"
         mc:Ignorable="d"
         Title="Batch Rename" Height="450" Width="800" ResizeMode="NoResize"
+        Loaded="Window_Loaded"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -95,17 +96,20 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal">
                         <RadioButton
+                          x:Name="file"
                           Margin="16 4 16 4"
                           Style="{DynamicResource MaterialDesignUserForegroundRadioButton}"
                           Content="Rename File" 
                           IsChecked="True" />        
                         <RadioButton
+                          x:Name="folder"
                           Margin="16 4 16 4"
                           Style="{DynamicResource MaterialDesignUserForegroundRadioButton}"
                           Content="Rename Folder" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Column="2">
                         <Button
+                            Click="Add_Button_Click"
                           Margin="5"
                           Style="{StaticResource MaterialDesignRaisedLightButton}"
                           ToolTip="Add a new File or Folder"
@@ -127,7 +131,7 @@
                         </Button>
                     </StackPanel>
                 </Grid>
-                <ListView ItemsSource="{Binding Items1}">
+                <ListView x:Name="fileList">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn
