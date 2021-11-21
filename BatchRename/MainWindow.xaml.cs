@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Win32;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace BatchRename
 {
@@ -24,10 +14,28 @@ namespace BatchRename
         {
             InitializeComponent();
         }
-
+        BindingList<File> files = new BindingList<File>();
         private void TwitterButton_OnClick(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            fileList.ItemsSource = files;
+        }
+        private void Add_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (file.IsChecked == true)
+            {
+                OpenFileDialog dialog = new OpenFileDialog();
+                dialog.Multiselect = true;
+                if (dialog.ShowDialog() == true)
+                {
+                    foreach (string file in dialog.FileNames)
+                        files.Add(new File() { Name = Path.GetFileName(file), Path = Path.GetDirectoryName(file) });
+                }
+            }
         }
     }
 }
