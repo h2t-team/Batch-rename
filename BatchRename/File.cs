@@ -10,5 +10,7 @@ namespace BatchRename
     {
         public string Name { get; set; }
         public string Path { get; set; }
+        public string Preview { get; set; }
+        public string Status { get; set; }
     }
 }
