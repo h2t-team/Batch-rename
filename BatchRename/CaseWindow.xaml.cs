@@ -15,25 +15,25 @@ using System.Windows.Shapes;
 namespace BatchRename
 {
     /// <summary>
-    /// Interaction logic for ChangeExtRule.xaml
+    /// Interaction logic for NewCaseRule.xaml
     /// </summary>
-    public partial class ChangeExtRule : Window
+    public partial class CaseWindow : Window
     {
-        public string Ext { set; get; }
-        public ChangeExtRule()
+        public string RuleName { get; set; }
+        public CaseWindow()
         {
             InitializeComponent();
-        }
-
-        private void Confirm_Button_Click(object sender, RoutedEventArgs e)
-        {
-            Ext = ExtTxt.Text;
-            DialogResult = true;
         }
 
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+        }
+
+        private void Confirm_Button_Click(object sender, RoutedEventArgs e)
+        {
+            RuleName = RuleBox.Text;
+            DialogResult = true;
         }
     }
 }

@@ -17,11 +17,11 @@ namespace BatchRename
     /// <summary>
     /// Interaction logic for AddRules.xaml
     /// </summary>
-    public partial class AddRules : Window
+    public partial class AddWindow : Window
     {
         public string RuleName { get; set; }
         public string Word { set; get; }
-        public AddRules()
+        public AddWindow()
         {
             InitializeComponent();
         }

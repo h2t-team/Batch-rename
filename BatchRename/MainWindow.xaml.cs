@@ -43,7 +43,17 @@ namespace BatchRename
                 }
             }
         }
-
+        private void Preview_Button_Click(object sender, RoutedEventArgs e)
+        {
+            for(int i = 0; i < files.Count; i++)
+            {
+                files[i].Preview = files[i].Name;
+                foreach (var rule in rules)
+                {
+                    files[i].Preview = rule.Rename(files[i].Preview);
+                }
+            }
+        }
         private void Batch_Button_Click(object sender, RoutedEventArgs e)
         {
             
@@ -63,7 +73,7 @@ namespace BatchRename
             switch (option)
             {
                 case "Add":
-                    AddRules addDialog = new AddRules();
+                    AddWindow addDialog = new AddWindow();
                     if(addDialog.ShowDialog() == true)
                     {
                         if (addDialog.RuleName.Equals("Add Prefix"))
@@ -79,7 +89,7 @@ namespace BatchRename
                     }
                     break;
                 case "New Case":
-                    NewCaseRule caseDialog = new NewCaseRule();
+                    CaseWindow caseDialog = new CaseWindow();
                     if (caseDialog.ShowDialog() == true)
                     {
                         presetComboBox.Items.Remove(presetComboBox.SelectedItem);
@@ -106,7 +116,7 @@ namespace BatchRename
                     presets.Add(new TrimRuleUI());
                     break;
                 case "Change Extension":
-                    ChangeExtRule extDialog = new ChangeExtRule();
+                    ExtensionWindow extDialog = new ExtensionWindow();
                     if (extDialog.ShowDialog() == true)
                     {
                         presetComboBox.Items.Remove(presetComboBox.SelectedItem);
@@ -118,8 +128,8 @@ namespace BatchRename
                     ReplaceWindow replaceDialog = new ReplaceWindow();
                     if (replaceDialog.ShowDialog() == true)
                     {
-                        presets.Add(new ReplaceRuleUI(replaceDialog.wordBinding.ToList<string>(), replaceDialog.Replacer));
-                        rules.Add(new ReplaceRule(replaceDialog.wordBinding.ToList<string>(), replaceDialog.Replacer));
+                        presets.Add(new ReplaceRuleUI(replaceDialog.needles, replaceDialog.Replacer));
+                        rules.Add(new ReplaceRule(replaceDialog.needles, replaceDialog.Replacer));
                     }
                     break;
             }
@@ -129,5 +139,6 @@ namespace BatchRename
         {
 
         }
+
     }
 }

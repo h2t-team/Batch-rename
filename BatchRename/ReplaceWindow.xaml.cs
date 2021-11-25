@@ -20,7 +20,8 @@ namespace BatchRename
     /// </summary>
     public partial class ReplaceWindow : Window
     {
-        public BindingList<string> wordBinding = new BindingList<string>();
+        private BindingList<string> wordBinding = new BindingList<string>();
+        public List<string> needles = new List<string>();
         public string Replacer { set; get; }
         public ReplaceWindow()
         {
@@ -32,9 +33,18 @@ namespace BatchRename
         }
         private void Add_Button_Click(object sender, RoutedEventArgs e)
         {
-            if (String.IsNullOrWhiteSpace(WordTxt.Text))
+            string word = WordTxt.Text;
+            if (String.IsNullOrEmpty(word))
                 return;
-            wordBinding.Add(WordTxt.Text);
+            if (String.IsNullOrWhiteSpace(word))
+                word = " ";
+            if (needles.IndexOf(word) != -1)
+            {
+                WordTxt.Text = "";
+                return;
+            }
+            wordBinding.Add($"\"{word}\"");
+            needles.Add(word);
             WordTxt.Text = "";
         }
         private void Delete_Click(object sender, RoutedEventArgs e)

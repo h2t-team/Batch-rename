@@ -121,22 +121,33 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Column="2">
                         <Button
-                            Click="Add_Button_Click"
-                          Margin="5"
-                          Style="{StaticResource MaterialDesignRaisedLightButton}"
-                          ToolTip="Add a new File or Folder"
-                          IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+                              Click="Add_Button_Click"
+                              Margin="5"
+                              Style="{StaticResource MaterialDesignRaisedLightButton}"
+                              ToolTip="Add a new File or Folder"
+                              IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource   FindAncestor, AncestorType=Window}}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Plus" VerticalAlignment="Center"/>
                                 <Label>Add</Label>
                             </StackPanel>
                         </Button>
                         <Button
-                          Click="Batch_Button_Click"
-                          Margin="5 5 10 5"
-                          Style="{StaticResource MaterialDesignRaisedLightButton}"
-                          ToolTip="Start batching the Files or Folders"
-                          IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+                              Click="Preview_Button_Click"
+                              Margin="5"
+                              Style="{StaticResource MaterialDesignRaisedLightButton}"
+                              ToolTip="Preview the name"
+                              IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource   FindAncestor, AncestorType=Window}}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Eye" VerticalAlignment="Center"/>
+                                <Label>Preview</Label>
+                            </StackPanel>
+                        </Button>
+                        <Button
+                              Click="Batch_Button_Click"
+                              Margin="5 5 10 5"
+                              Style="{StaticResource MaterialDesignRaisedLightButton}"
+                              ToolTip="Start batching the Files or Folders"
+                              IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource   FindAncestor, AncestorType=Window}}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Play" VerticalAlignment="Center"/>
                                 <Label>Batch</Label>

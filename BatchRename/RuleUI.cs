@@ -13,6 +13,7 @@ namespace BatchRename
 
     public class AddPrefixRuleUI : RuleUI
     {
+        public static string TYPE = "AddPrefix";
         public AddPrefixRuleUI(string prefix)
         {
             Display = $"Add Prefix: {prefix}";
@@ -20,6 +21,7 @@ namespace BatchRename
     }
     public class AddSuffixRuleUI : RuleUI
     {
+        public static string TYPE = "AddSuffix";
         public AddSuffixRuleUI(string suffix)
         {
             Display = $"Add Suffix: {suffix}";
@@ -27,6 +29,7 @@ namespace BatchRename
     }
     public class AllLowerRuleUI : RuleUI
     {
+        public static string TYPE = "AllLower";
         public AllLowerRuleUI()
         {
             Display = "All Lower Case";
@@ -34,6 +37,7 @@ namespace BatchRename
     }
     public class AllUpperRuleUI : RuleUI
     {
+        public static string TYPE = "AllUpper";
         public AllUpperRuleUI()
         {
             Display = "All Upper Case";
@@ -41,6 +45,7 @@ namespace BatchRename
     }
     public class ChangeExtRuleUI : RuleUI
     {
+        public static string TYPE = "ChangeExtension";
         public ChangeExtRuleUI(string ext)
         {
             Display = $"Change Extension: {ext}";
@@ -48,6 +53,7 @@ namespace BatchRename
     }
     public class PascalCaseRuleUI : RuleUI
     {
+        public static string TYPE = "PascalCase";
         public PascalCaseRuleUI()
         {
             Display = "Pascal Case";
@@ -55,6 +61,7 @@ namespace BatchRename
     }
     public class ReplaceRuleUI : RuleUI
     {
+        public static string TYPE = "Replace";
         public ReplaceRuleUI(List<string> needles, string replacer)
         {
             for(int i =0; i < needles.Count(); i++)
@@ -64,6 +71,7 @@ namespace BatchRename
     }
     public class TrimRuleUI : RuleUI
     {
+        public static string TYPE = "Trim";
         public TrimRuleUI()
         {
             Display = "Trim";
