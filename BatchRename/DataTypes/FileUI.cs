@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BatchRename
+namespace BatchRename.DataTypes
 {
-    public class File : INotifyPropertyChanged
+    public class FileUI : INotifyPropertyChanged
     {
         public string Name { get; set; }
         public string Path { get; set; }
