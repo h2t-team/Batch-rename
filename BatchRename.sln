@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BatchRename", "BatchRename\BatchRename.csproj", "{018513F8-1836-4A63-A396-AE0775D1162C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RenameLib", "RenameLib\RenameLib.csproj", "{AA754243-9D27-4AE3-837E-2B31BC036098}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{018513F8-1836-4A63-A396-AE0775D1162C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{018513F8-1836-4A63-A396-AE0775D1162C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{018513F8-1836-4A63-A396-AE0775D1162C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA754243-9D27-4AE3-837E-2B31BC036098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA754243-9D27-4AE3-837E-2B31BC036098}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA754243-9D27-4AE3-837E-2B31BC036098}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA754243-9D27-4AE3-837E-2B31BC036098}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BatchRename"
         mc:Ignorable="d"
-        Title="Batch Rename" Height="450" Width="800" ResizeMode="NoResize"
+        Title="Batch Rename" Height="600" Width="900"
         Loaded="Window_Loaded"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -54,33 +54,45 @@
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
-                    <ComboBox VerticalContentAlignment="Center" materialDesign:HintAssist.Hint="Action" Grid.Column="0" Padding="5" Margin="10 5" materialDesign:HintAssist.HelperText="Select one action">
+                    <ComboBox Name="presetComboBox" VerticalContentAlignment="Center" materialDesign:HintAssist.Hint="Action" Grid.Column="0" Padding="5" Margin="10 5" materialDesign:HintAssist.HelperText="Select one action">
                         <ComboBoxItem Content="Replace" />
                         <ComboBoxItem Content="Add" />
-                        <ComboBoxItem Content="Remove" />
-                        <ComboBoxItem Content="Convert" />
+                        <ComboBoxItem Content="New Case" />
+                        <ComboBoxItem Content="Change Extension" />
+                        <ComboBoxItem Content="Trim" />
                     </ComboBox>
                     <Button Grid.Column="1"
                       Margin="5"
                       Padding="0"
                       Style="{StaticResource MaterialDesignFlatDarkButton}"
                       ToolTip="Add an action to the preset"
-                      IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+                      IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                      Click="Add_Preset_Click">
                         <materialDesign:PackIcon Kind="Plus"/>
                     </Button>
                 </Grid>
-                <GroupBox Header="PRESETS" BorderThickness="0" Height="278" Margin="0 20">
+                <GroupBox Header="PRESETS" BorderThickness="0" Margin="0 20">
                     <StackPanel>
-                        <ListView ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                            <ListViewItem>
-                                <TextBlock TextWrapping="Wrap">Hello</TextBlock>
-                            </ListViewItem>
-                            <ListViewItem>
-                                <TextBlock TextWrapping="Wrap">Hello</TextBlock>
-                            </ListViewItem>
-                            <ListViewItem>
-                                <TextBlock TextWrapping="Wrap">Hello</TextBlock>
-                            </ListViewItem>
+                        <ListView x:Name="presetList" 
+                           ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextWrapping="Wrap"
+                                               FontSize="16px"
+                                               Text="{Binding Display}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                            <ListView.Resources>
+                                <ContextMenu x:Key="ItemContextMenu">
+                                    <MenuItem Header="Update" Click="Update_Preset_Click"/>
+                                    <MenuItem Header="Delete" Click="Delete_Preset_Click"/>
+                                </ContextMenu>
+                            </ListView.Resources>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}" >
+                                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
                         </ListView>
                     </StackPanel>
                 </GroupBox>
@@ -109,21 +121,33 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Column="2">
                         <Button
-                            Click="Add_Button_Click"
-                          Margin="5"
-                          Style="{StaticResource MaterialDesignRaisedLightButton}"
-                          ToolTip="Add a new File or Folder"
-                          IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+                              Click="Add_Button_Click"
+                              Margin="5"
+                              Style="{StaticResource MaterialDesignRaisedLightButton}"
+                              ToolTip="Add a new File or Folder"
+                              IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource   FindAncestor, AncestorType=Window}}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Plus" VerticalAlignment="Center"/>
                                 <Label>Add</Label>
                             </StackPanel>
                         </Button>
                         <Button
-                          Margin="5 5 10 5"
-                          Style="{StaticResource MaterialDesignRaisedLightButton}"
-                          ToolTip="Start batching the Files or Folders"
-                          IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+                              Click="Preview_Button_Click"
+                              Margin="5"
+                              Style="{StaticResource MaterialDesignRaisedLightButton}"
+                              ToolTip="Preview the name"
+                              IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource   FindAncestor, AncestorType=Window}}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Eye" VerticalAlignment="Center"/>
+                                <Label>Preview</Label>
+                            </StackPanel>
+                        </Button>
+                        <Button
+                              Click="Batch_Button_Click"
+                              Margin="5 5 10 5"
+                              Style="{StaticResource MaterialDesignRaisedLightButton}"
+                              ToolTip="Start batching the Files or Folders"
+                              IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource   FindAncestor, AncestorType=Window}}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Play" VerticalAlignment="Center"/>
                                 <Label>Batch</Label>
@@ -136,18 +160,14 @@
                         <GridView>
                             <GridViewColumn
                                 DisplayMemberBinding="{Binding Name}"
-                                Header="Name" />
+                                Header="Name"/>
                             <GridViewColumn
-                                Header="Preview" />
+                                DisplayMemberBinding="{Binding Preview}"
+                                Header="Preview"/>
                             <GridViewColumn
                                 DisplayMemberBinding="{Binding Path}"
                                 Header="Path" />
-                            <GridViewColumn Header="Status">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
+                            <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}">
                             </GridViewColumn>
                         </GridView>
                     </ListView.View>
