@@ -75,13 +75,6 @@
                     <StackPanel>
                         <ListView x:Name="presetList" 
                            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock TextWrapping="Wrap"
-                                               FontSize="16px"
-                                               Text="{Binding Display}"/>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
                             <ListView.Resources>
                                 <ContextMenu x:Key="ItemContextMenu">
                                     <MenuItem Header="Update" Click="Update_Preset_Click"/>
@@ -155,7 +148,16 @@
                         </Button>
                     </StackPanel>
                 </Grid>
-                <ListView x:Name="fileList">
+                <ListView x:Name="fileList" 
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          SizeChanged="ListView_SizeChanged">
+                    <ListView.Style>
+                        <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource MaterialDesignListView}">
+                            <Setter Property="OverridesDefaultStyle" Value="True" />
+                            <Setter Property="BorderThickness" Value="10,10,10,10" />
+                            <Setter Property="Padding" Value="5" />
+                        </Style>
+                    </ListView.Style>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn
@@ -166,9 +168,10 @@
                                 Header="Preview"/>
                             <GridViewColumn
                                 DisplayMemberBinding="{Binding Path}"
-                                Header="Path" />
-                            <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}">
-                            </GridViewColumn>
+                                Header="Path"/>
+                            <GridViewColumn 
+                                Header="Status" 
+                                DisplayMemberBinding="{Binding Status}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
