@@ -7,6 +7,9 @@ using RenameLib;
 using System.Linq;
 using System.Windows.Controls;
 
+using BatchRename.View;
+using BatchRename.DataTypes;
+
 namespace BatchRename
 {
     /// <summary>
@@ -14,7 +17,7 @@ namespace BatchRename
     /// </summary>
     public partial class MainWindow : Window
     {
-        BindingList<File> files = new BindingList<File>();
+        BindingList<FileUI> files = new BindingList<FileUI>();
         BindingList<RuleUI> presets = new BindingList<RuleUI>();
         List<IRenameRule> rules = new List<IRenameRule>();
         public MainWindow()
@@ -36,7 +39,7 @@ namespace BatchRename
                 if (dialog.ShowDialog() == true)
                 {
                     foreach (string file in dialog.FileNames)
-                        files.Add(new File() { 
+                        files.Add(new FileUI() { 
                             Name = Path.GetFileName(file), 
                             Path = Path.GetDirectoryName(file), 
                             Preview = Path.GetFileName(file) , 
@@ -64,8 +67,27 @@ namespace BatchRename
             int index = presetList.SelectedIndex;
             if (index == -1)
                 return;
+            RuleUI selected = presets.ElementAt(index);
+            switch (selected.TYPE)
+            {
+                case "Trim":
+                    presetComboBox.Items.Add(new ComboBoxItem() { Content="Trim" });
+                    break;
+                case "AllLower":
+                case "AllUpper":
+                case "PascalCase":
+                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "New Case" });
+                    break;
+                case "ChangeExtension":
+                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "Change Extension" });
+                    break;
+            }
             rules.RemoveAt(index);
             presets.RemoveAt(index);
+        }
+        private void Update_Preset_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void Add_Preset_Click(object sender, RoutedEventArgs e)
@@ -136,10 +158,6 @@ namespace BatchRename
             }
         }
 
-        private void Update_Preset_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void ListView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
