@@ -30,6 +30,17 @@ namespace BatchRename
             fileList.ItemsSource = files;
             presetList.ItemsSource = presets;
         }
+        private void addFileListView(string[] fileArr)
+        {
+            foreach (string file in fileArr)
+                files.Add(new FileUI()
+                {
+                    Name = Path.GetFileName(file),
+                    Path = Path.GetDirectoryName(file),
+                    Preview = Path.GetFileName(file),
+                    Status = ""
+                });
+        }
         private void Add_Button_Click(object sender, RoutedEventArgs e)
         {
             if (file.IsChecked == true)
@@ -38,12 +49,7 @@ namespace BatchRename
                 dialog.Multiselect = true;
                 if (dialog.ShowDialog() == true)
                 {
-                    foreach (string file in dialog.FileNames)
-                        files.Add(new FileUI() { 
-                            Name = Path.GetFileName(file), 
-                            Path = Path.GetDirectoryName(file), 
-                            Preview = Path.GetFileName(file) , 
-                            Status=""});
+                    addFileListView(dialog.FileNames);
                 }
             }
         }
@@ -174,6 +180,20 @@ namespace BatchRename
             gView.Columns[1].Width = workingWidth * col2;
             gView.Columns[2].Width = workingWidth * col3;
             gView.Columns[3].Width = workingWidth * col4;
+        }
+
+        private void HandleFileDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] fileArr = (string[]) e.Data.GetData(DataFormats.FileDrop);
+                addFileListView(fileArr);
+            }
+        }
+
+        private void handleCardSize(object sender, SizeChangedEventArgs e)
+        {
+            fileList.Height = fileCard.ActualHeight - fileOptions.ActualHeight;
         }
     }
 }

@@ -75,6 +75,13 @@
                     <StackPanel>
                         <ListView x:Name="presetList" 
                            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextWrapping="Wrap"
+                                               FontSize="16px"
+                                               Text="{Binding Display}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
                             <ListView.Resources>
                                 <ContextMenu x:Key="ItemContextMenu">
                                     <MenuItem Header="Update" Click="Update_Preset_Click"/>
@@ -91,9 +98,14 @@
                 </GroupBox>
             </StackPanel>
         </materialDesign:Card>
-        <materialDesign:Card Grid.Column="1" Grid.Row="1" Margin="5 5 10 10">
+        <materialDesign:Card Grid.Column="1" 
+                             Grid.Row="1" 
+                             Margin="5 5 10 10" 
+                             AllowDrop="True" 
+                             Drop="HandleFileDrop" x:Name="fileCard"
+                             SizeChanged="handleCardSize">
             <StackPanel>
-                <Grid Height="50">
+                <Grid Height="50" x:Name="fileOptions">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*" />
@@ -150,7 +162,9 @@
                 </Grid>
                 <ListView x:Name="fileList" 
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          SizeChanged="ListView_SizeChanged">
+                          SizeChanged="ListView_SizeChanged"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.CanContentScroll="False">
                     <ListView.Style>
                         <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource MaterialDesignListView}">
                             <Setter Property="OverridesDefaultStyle" Value="True" />
