@@ -8,7 +8,7 @@ namespace RenameLib
         public string Replacer { get; set; }
         public ReplaceRule(List<string> needles, string replacer)
         {
-            this.Needles = needles;
+            this.Needles = new List<string>(needles);
             this.Replacer = replacer;
         }
         public string Rename(string src)
