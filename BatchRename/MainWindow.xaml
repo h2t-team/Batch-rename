@@ -35,7 +35,6 @@
                 </Button>
                 <Button Style="{StaticResource MaterialDesignFlatDarkButton}"
                         Click="Save_Preset_Button_Click"
-                        Name="savePresetButton"
                         ToolTip="Save the current preset">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="ContentSave" VerticalAlignment="Center"/>
