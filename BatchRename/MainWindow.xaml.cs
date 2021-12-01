@@ -88,12 +88,80 @@ namespace BatchRename
                     presetComboBox.Items.Add(new ComboBoxItem() { Content = "Change Extension" });
                     break;
             }
-            rules.RemoveAt(index);
-            presets.RemoveAt(index);
         }
         private void Update_Preset_Click(object sender, RoutedEventArgs e)
         {
-
+            int index = presetList.SelectedIndex;
+            if (index == -1)
+                return;
+            RuleUI selected = presets.ElementAt(index);
+            switch (selected.TYPE)
+            {
+                case "AddPrefix":
+                case "AddSuffix":
+                    UpdateAddWindow addDialog = new UpdateAddWindow(selected);
+                    if (addDialog.ShowDialog() == true)
+                    {
+                        switch (selected.TYPE)
+                        {
+                            case "AddPrefix":
+                                ((AddPrefixRuleUI)selected).Prefix = addDialog.Word;                                
+                                ((AddPrefixRule)rules[index]).Prefix = addDialog.Word;
+                                break;
+                            case "AddSuffix":
+                                ((AddSuffixRuleUI)selected).Suffix = addDialog.Word;
+                                ((AddSuffixRuleUI)rules[index]).Suffix = addDialog.Word;
+                                break;
+                        }
+                        selected.Update();
+                    }
+                    break;
+                case "ChangeExtension":
+                    UpdateExtWindow extDialog = new UpdateExtWindow(selected);
+                    if (extDialog.ShowDialog() == true)
+                    {
+                        ((ChangeExtRuleUI)selected).Ext = extDialog.Ext;
+                        selected.Update();
+                        ((ChangeExtensionRule)rules[index]).Extension = extDialog.Ext;
+                    }
+                    break;
+                case "AllUpper":
+                case "AllLower":
+                case "PascalCase":
+                    UpdateCaseWindow caseDialog = new UpdateCaseWindow(selected);
+                    if (caseDialog.ShowDialog() == true)
+                    {
+                        if (selected.TYPE == caseDialog.RuleName)
+                            return;
+                        rules.RemoveAt(index);
+                        presets.RemoveAt(index);
+                        switch (caseDialog.RuleName)
+                        {
+                            case "AllUpper":
+                                presets.Insert(index, new AllUpperRuleUI());
+                                rules.Insert(index, new AllUpperRule());
+                                break;
+                            case "AllLower":
+                                presets.Insert(index, new AllLowerRuleUI());
+                                rules.Insert(index, new AllLowerRule());
+                                break;   
+                            case "PascalCase":
+                                presets.Insert(index, new PascalCaseRuleUI());
+                                rules.Insert(index, new PascalCaseRule());
+                                break;
+                        }
+                    }
+                    break;
+                case "Replace":
+                    UpdateReplaceWindow replaceDialog = new UpdateReplaceWindow(selected);
+                    if (replaceDialog.ShowDialog() == true)
+                    {
+                        ((ReplaceRuleUI)selected).Needles = new List<string>(replaceDialog.Needles);
+                        selected.Update();
+                        ((ReplaceRule)rules[index]).Needles = new List<string>(replaceDialog.Needles);
+                    }
+                    break;
+            }
         }
 
         private void Add_Preset_Click(object sender, RoutedEventArgs e)
@@ -105,15 +173,16 @@ namespace BatchRename
                     AddWindow addDialog = new AddWindow();
                     if(addDialog.ShowDialog() == true)
                     {
-                        if (addDialog.RuleName.Equals("Add Prefix"))
+                        switch (addDialog.RuleName)
                         {
-                            rules.Add(new AddPrefixRule(addDialog.Word));
-                            presets.Add(new AddPrefixRuleUI(addDialog.Word));
-                        }
-                        else
-                        {
-                            rules.Add(new AddSuffixRule(addDialog.Word));
-                            presets.Add(new AddSuffixRuleUI(addDialog.Word));
+                            case "Add Prefix":
+                                rules.Add(new AddPrefixRule(addDialog.Word));
+                                presets.Add(new AddPrefixRuleUI(addDialog.Word));
+                                break;
+                            case "Add Suffix":
+                                rules.Add(new AddSuffixRule(addDialog.Word));
+                                presets.Add(new AddSuffixRuleUI(addDialog.Word));
+                                break;
                         }
                     }
                     break;
@@ -122,20 +191,20 @@ namespace BatchRename
                     if (caseDialog.ShowDialog() == true)
                     {
                         presetComboBox.Items.Remove(presetComboBox.SelectedItem);
-                        if (caseDialog.RuleName.Equals("All Upper Case"))
+                        switch (caseDialog.RuleName)
                         {
-                            rules.Add(new AllUpperRule());
-                            presets.Add(new AllUpperRuleUI());
-                        }
-                        else if(caseDialog.RuleName.Equals("All Lower Case"))
-                        {
-                            rules.Add(new AllLowerRule());
-                            presets.Add(new AllLowerRuleUI());
-                        }
-                        else
-                        {
-                            rules.Add(new PascalCaseRule());
-                            presets.Add(new PascalCaseRuleUI());
+                            case "All Upper Case":
+                                rules.Add(new AllUpperRule());
+                                presets.Add(new AllUpperRuleUI());
+                                break;
+                            case "All Lower Case":
+                                rules.Add(new AllLowerRule());
+                                presets.Add(new AllLowerRuleUI());
+                                break;
+                            case "Pascal Case":
+                                rules.Add(new PascalCaseRule());
+                                presets.Add(new PascalCaseRuleUI());
+                                break;
                         }
                     }
                     break;
@@ -157,8 +226,8 @@ namespace BatchRename
                     ReplaceWindow replaceDialog = new ReplaceWindow();
                     if (replaceDialog.ShowDialog() == true)
                     {
-                        presets.Add(new ReplaceRuleUI(replaceDialog.needles, replaceDialog.Replacer));
-                        rules.Add(new ReplaceRule(replaceDialog.needles, replaceDialog.Replacer));
+                        presets.Add(new ReplaceRuleUI(replaceDialog.Needles, replaceDialog.Replacer));
+                        rules.Add(new ReplaceRule(replaceDialog.Needles, replaceDialog.Replacer));
                     }
                     break;
             }

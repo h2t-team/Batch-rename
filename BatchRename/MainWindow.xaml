@@ -55,7 +55,7 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
                     <ComboBox Name="presetComboBox" VerticalContentAlignment="Center" materialDesign:HintAssist.Hint="Action" Grid.Column="0" Padding="5" Margin="10 5" materialDesign:HintAssist.HelperText="Select one action">
-                        <ComboBoxItem Content="Replace" />
+                        <ComboBoxItem Content="Replace"/>
                         <ComboBoxItem Content="Add" />
                         <ComboBoxItem Content="New Case" />
                         <ComboBoxItem Content="Change Extension" />
@@ -90,7 +90,7 @@
                             </ListView.Resources>
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListViewItem}" >
-                                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}"/>
                                 </Style>
                             </ListView.ItemContainerStyle>
                         </ListView>
