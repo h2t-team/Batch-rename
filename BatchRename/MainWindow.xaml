@@ -34,7 +34,8 @@
                     </StackPanel>
                 </Button>
                 <Button Style="{StaticResource MaterialDesignFlatDarkButton}"
-                    ToolTip="Save the current preset">
+                        Click="Save_Preset_Button_Click"
+                        ToolTip="Save the current preset">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="ContentSave" VerticalAlignment="Center"/>
                         <Label>Save</Label>

@@ -318,5 +318,25 @@ namespace BatchRename
         {
             fileList.Height = fileCard.ActualHeight - fileOptions.ActualHeight;
         }
+
+        private void Save_Preset_Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Displays a SaveFileDialog so the user can save the current preset.
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Text Documents|*.txt";
+            saveFileDialog.Title = "Save the current preset";
+            saveFileDialog.ShowDialog();
+            // If the file name is not an empty string open it for saving.
+            if (saveFileDialog.FileName != "")
+            {
+                //write all rules in textout
+                string textout = "";
+                foreach (var rule in presets)
+                {
+                    textout = textout + rule.Display + Environment.NewLine;
+                }
+                File.WriteAllText(saveFileDialog.FileName, textout);
+            }
+        }
     }
 }
