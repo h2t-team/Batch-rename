@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using BatchRename.View;
 using BatchRename.DataTypes;
 using System;
+using System.Reflection;
 
 namespace BatchRename
 {
@@ -25,7 +26,51 @@ namespace BatchRename
         {
             InitializeComponent();
         }
-
+        private void LoadRuleFromUI()
+        {
+            rules.Clear();
+            foreach(var preset in presets)
+            {
+                string exePath = Assembly.GetExecutingAssembly().Location;
+                string folder = Path.GetDirectoryName(exePath);
+                FileInfo info = new DirectoryInfo(folder).GetFiles($"{preset.TYPE}Rule.dll")[0];
+                Assembly assembly = Assembly.LoadFile(info.FullName);
+                var type = assembly.GetTypes()[0];
+                if (type.IsClass && typeof(IRenameRule).IsAssignableFrom(type))
+                {
+                    switch (preset.TYPE)
+                    {                        
+                        case "AddPrefix":
+                            rules.Add(Activator.CreateInstance(type, new object[] { 
+                                ((AddPrefixRuleUI)preset).Prefix 
+                            }) as IRenameRule);
+                            break;
+                        case "AddSuffix":
+                            rules.Add(Activator.CreateInstance(type, new object[] {
+                                ((AddSuffixRuleUI)preset).Suffix
+                            }) as IRenameRule);
+                            break;
+                        case "ChangeExtension":
+                            rules.Add(Activator.CreateInstance(type, new object[] {
+                                ((ChangeExtRuleUI)preset).Ext
+                            }) as IRenameRule);
+                            break;
+                        case "Replace":
+                            rules.Add(Activator.CreateInstance(type, new object[] {
+                                ((ReplaceRuleUI)preset).Needles, 
+                                ((ReplaceRuleUI)preset).Replacer
+                            }) as IRenameRule);
+                            break;
+                        case "AllUpper":
+                        case "AllLower":
+                        case "PascalCase":
+                        case "Trim":
+                            rules.Add(Activator.CreateInstance(type) as IRenameRule);
+                            break;
+                    }   
+                }
+            }
+        }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             fileList.ItemsSource = files;
@@ -56,18 +101,39 @@ namespace BatchRename
         }
         private void Preview_Button_Click(object sender, RoutedEventArgs e)
         {
-            for(int i = 0; i < files.Count; i++)
+            LoadRuleFromUI();
+            foreach(var file in files)
             {
-                files[i].Preview = files[i].Name;
+                file.Preview = file.Name;
                 foreach (var rule in rules)
                 {
-                    files[i].Preview = rule.Rename(files[i].Preview);
+                    file.Preview = rule.Rename(file.Preview);
                 }
             }
         }
         private void Batch_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            LoadRuleFromUI();
+            if (rules.Count == 0 || files.Count == 0) 
+                return;
+            foreach(var file in files)
+            {
+                string newName = file.Name;
+                foreach(var rule in rules)
+                {
+                    newName = rule.Rename(newName);
+                }
+                try
+                {
+                    File.Move($"{file.Path}\\{file.Name}", $"{file.Path}\\{newName}");
+                    file.Status = "Success";
+                    file.Name = newName;
+                }
+                catch (Exception)
+                {
+                    file.Status = "Failed";
+                }
+            }
         }
         private void Delete_Preset_Click(object sender, RoutedEventArgs e)
         {
@@ -89,6 +155,8 @@ namespace BatchRename
                     presetComboBox.Items.Add(new ComboBoxItem() { Content = "Change Extension" });
                     break;
             }
+            rules.RemoveAt(index);
+            presets.RemoveAt(index);
         }
         private void Update_Preset_Click(object sender, RoutedEventArgs e)
         {
@@ -106,12 +174,10 @@ namespace BatchRename
                         switch (selected.TYPE)
                         {
                             case "AddPrefix":
-                                ((AddPrefixRuleUI)selected).Prefix = addDialog.Word;                                
-                                ((AddPrefixRule)rules[index]).Prefix = addDialog.Word;
+                                ((AddPrefixRuleUI)selected).Prefix = addDialog.Word;
                                 break;
                             case "AddSuffix":
                                 ((AddSuffixRuleUI)selected).Suffix = addDialog.Word;
-                                ((AddSuffixRuleUI)rules[index]).Suffix = addDialog.Word;
                                 break;
                         }
                         selected.Update();
@@ -123,7 +189,6 @@ namespace BatchRename
                     {
                         ((ChangeExtRuleUI)selected).Ext = extDialog.Ext;
                         selected.Update();
-                        ((ChangeExtensionRule)rules[index]).Extension = extDialog.Ext;
                     }
                     break;
                 case "AllUpper":
@@ -140,15 +205,12 @@ namespace BatchRename
                         {
                             case "AllUpper":
                                 presets.Insert(index, new AllUpperRuleUI());
-                                rules.Insert(index, new AllUpperRule());
                                 break;
                             case "AllLower":
                                 presets.Insert(index, new AllLowerRuleUI());
-                                rules.Insert(index, new AllLowerRule());
                                 break;   
                             case "PascalCase":
                                 presets.Insert(index, new PascalCaseRuleUI());
-                                rules.Insert(index, new PascalCaseRule());
                                 break;
                         }
                     }
@@ -159,7 +221,6 @@ namespace BatchRename
                     {
                         ((ReplaceRuleUI)selected).Needles = new List<string>(replaceDialog.Needles);
                         selected.Update();
-                        ((ReplaceRule)rules[index]).Needles = new List<string>(replaceDialog.Needles);
                     }
                     break;
             }
@@ -177,11 +238,9 @@ namespace BatchRename
                         switch (addDialog.RuleName)
                         {
                             case "Add Prefix":
-                                rules.Add(new AddPrefixRule(addDialog.Word));
                                 presets.Add(new AddPrefixRuleUI(addDialog.Word));
                                 break;
                             case "Add Suffix":
-                                rules.Add(new AddSuffixRule(addDialog.Word));
                                 presets.Add(new AddSuffixRuleUI(addDialog.Word));
                                 break;
                         }
@@ -195,15 +254,12 @@ namespace BatchRename
                         switch (caseDialog.RuleName)
                         {
                             case "All Upper Case":
-                                rules.Add(new AllUpperRule());
                                 presets.Add(new AllUpperRuleUI());
                                 break;
                             case "All Lower Case":
-                                rules.Add(new AllLowerRule());
                                 presets.Add(new AllLowerRuleUI());
                                 break;
                             case "Pascal Case":
-                                rules.Add(new PascalCaseRule());
                                 presets.Add(new PascalCaseRuleUI());
                                 break;
                         }
@@ -211,7 +267,6 @@ namespace BatchRename
                     break;
                 case "Trim":
                     presetComboBox.Items.Remove(presetComboBox.SelectedItem);
-                    rules.Add(new TrimRule());
                     presets.Add(new TrimRuleUI());
                     break;
                 case "Change Extension":
@@ -219,7 +274,6 @@ namespace BatchRename
                     if (extDialog.ShowDialog() == true)
                     {
                         presetComboBox.Items.Remove(presetComboBox.SelectedItem);
-                        rules.Add(new ChangeExtensionRule(extDialog.Ext));
                         presets.Add(new ChangeExtRuleUI(extDialog.Ext));
                     }
                     break;
@@ -228,7 +282,6 @@ namespace BatchRename
                     if (replaceDialog.ShowDialog() == true)
                     {
                         presets.Add(new ReplaceRuleUI(replaceDialog.Needles, replaceDialog.Replacer));
-                        rules.Add(new ReplaceRule(replaceDialog.Needles, replaceDialog.Replacer));
                     }
                     break;
             }
