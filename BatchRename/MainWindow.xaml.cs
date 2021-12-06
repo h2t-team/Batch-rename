@@ -177,8 +177,9 @@ namespace BatchRename
                 arr = folders;
             foreach(var rule in rules)
                 newNames = rule.Rename(newNames);
-            for (int i = 0; i < files.Count; i++)
+            for (int i = 0; i < arr.Count; i++) 
                 arr[i].Preview = newNames[i];
+            arr.ResetBindings();
         }
         private void Batch_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -196,7 +197,10 @@ namespace BatchRename
             {              
                 try
                 {
-                    File.Move($"{arr[i].Path}\\{arr[i].Name}", $"{arr[i].Path}\\{newNames[i]}");
+                    if(file.IsChecked == true)
+                        File.Move($"{arr[i].Path}\\{arr[i].Name}", $"{arr[i].Path}\\{newNames[i]}");
+                    else if (folder.IsChecked == true)
+                        Directory.Move($"{arr[i].Path}\\{arr[i].Name}", $"{arr[i].Path}\\{newNames[i]}");
                     arr[i].Status = "Success";
                     arr[i].Name = newNames[i];
                 }
@@ -205,6 +209,7 @@ namespace BatchRename
                     arr[i].Status = "Failed";
                 }
             }
+            arr.ResetBindings();
         }
         private void Delete_Preset_Click(object sender, RoutedEventArgs e)
         {
