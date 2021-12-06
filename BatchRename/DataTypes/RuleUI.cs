@@ -17,6 +17,24 @@ namespace BatchRename.DataTypes
         public abstract void Update();
     }
 
+    public class AddCounterRuleUI : RuleUI
+    {
+        public int Start { set; get; }
+        public int Step { set; get; }
+        public int Digit { set; get; }
+        public AddCounterRuleUI(int start, int step, int digit)
+        {
+            TYPE = "AddCounter";
+            Start = start;
+            Step = step;
+            Digit = digit;
+            Update();
+        }
+        public override void Update()
+        {
+            Display = $"Add Counter: F{Start} S{Step} D{Digit}";
+        }
+    }
     public class AddPrefixRuleUI : RuleUI
     {
         public string Prefix { get; set; }

@@ -19,9 +19,10 @@ namespace BatchRename
     /// </summary>
     public partial class MainWindow : Window
     {
-        BindingList<FileUI> files = new BindingList<FileUI>();
-        BindingList<RuleUI> presets = new BindingList<RuleUI>();
-        List<IRenameRule> rules = new List<IRenameRule>();
+        BindingList<FileUI> files = new();
+        BindingList<RuleUI> presets = new();
+        List<IRenameRule> rules = new();
+        List<string> newNames = new();
         public MainWindow()
         {
             InitializeComponent();
@@ -29,17 +30,26 @@ namespace BatchRename
         private void LoadRuleFromUI()
         {
             rules.Clear();
+            newNames.Clear();
+            //Load rule dynamically
             foreach(var preset in presets)
             {
                 string exePath = Assembly.GetExecutingAssembly().Location;
                 string folder = Path.GetDirectoryName(exePath);
-                FileInfo info = new DirectoryInfo(folder).GetFiles($"{preset.TYPE}Rule.dll")[0];
+                FileInfo info = new DirectoryInfo(folder).GetFiles($"DLL/{preset.TYPE}Rule.dll")[0];
                 Assembly assembly = Assembly.LoadFile(info.FullName);
                 var type = assembly.GetTypes()[0];
                 if (type.IsClass && typeof(IRenameRule).IsAssignableFrom(type))
                 {
                     switch (preset.TYPE)
-                    {                        
+                    {
+                        case "AddCounter":
+                            rules.Add(Activator.CreateInstance(type, new object[] {
+                                ((AddCounterRuleUI)preset).Start,
+                                ((AddCounterRuleUI)preset).Step,
+                                ((AddCounterRuleUI)preset).Digit
+                            }) as IRenameRule);
+                            break;
                         case "AddPrefix":
                             rules.Add(Activator.CreateInstance(type, new object[] { 
                                 ((AddPrefixRuleUI)preset).Prefix 
@@ -69,6 +79,11 @@ namespace BatchRename
                             break;
                     }   
                 }
+            }
+            //Load file name to list
+            foreach(var file in files)
+            {
+                newNames.Add(file.Name);
             }
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -102,36 +117,29 @@ namespace BatchRename
         private void Preview_Button_Click(object sender, RoutedEventArgs e)
         {
             LoadRuleFromUI();
-            foreach(var file in files)
-            {
-                file.Preview = file.Name;
-                foreach (var rule in rules)
-                {
-                    file.Preview = rule.Rename(file.Preview);
-                }
-            }
+            foreach(var rule in rules)
+                newNames = rule.Rename(newNames);
+            for (int i = 0; i < files.Count; i++)
+                files[i].Preview = newNames[i];
         }
         private void Batch_Button_Click(object sender, RoutedEventArgs e)
         {
             LoadRuleFromUI();
             if (rules.Count == 0 || files.Count == 0) 
                 return;
-            foreach(var file in files)
-            {
-                string newName = file.Name;
-                foreach(var rule in rules)
-                {
-                    newName = rule.Rename(newName);
-                }
+            foreach (var rule in rules)
+                newNames = rule.Rename(newNames);
+            for (int i = 0; i < files.Count; i++)
+            {              
                 try
                 {
-                    File.Move($"{file.Path}\\{file.Name}", $"{file.Path}\\{newName}");
-                    file.Status = "Success";
-                    file.Name = newName;
+                    File.Move($"{files[i].Path}\\{files[i].Name}", $"{files[i].Path}\\{newNames[i]}");
+                    files[i].Status = "Success";
+                    files[i].Name = newNames[i];
                 }
                 catch (Exception)
                 {
-                    file.Status = "Failed";
+                    files[i].Status = "Failed";
                 }
             }
         }
@@ -143,6 +151,9 @@ namespace BatchRename
             RuleUI selected = presets.ElementAt(index);
             switch (selected.TYPE)
             {
+                case "AddCounter":
+                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "Add Counter" });
+                    break;
                 case "Trim":
                     presetComboBox.Items.Add(new ComboBoxItem() { Content="Trim" });
                     break;
@@ -155,7 +166,6 @@ namespace BatchRename
                     presetComboBox.Items.Add(new ComboBoxItem() { Content = "Change Extension" });
                     break;
             }
-            rules.RemoveAt(index);
             presets.RemoveAt(index);
         }
         private void Update_Preset_Click(object sender, RoutedEventArgs e)
@@ -166,6 +176,15 @@ namespace BatchRename
             RuleUI selected = presets.ElementAt(index);
             switch (selected.TYPE)
             {
+                case "AddCounter":
+                    UpdateCounterWindow counterDialog = new UpdateCounterWindow(selected);
+                    if(counterDialog.ShowDialog()== true)
+                    {
+                        ((AddCounterRuleUI)selected).Start = counterDialog.Start;
+                        ((AddCounterRuleUI)selected).Step = counterDialog.Step;
+                        ((AddCounterRuleUI)selected).Digit = counterDialog.Digit;
+                    }
+                    break;
                 case "AddPrefix":
                 case "AddSuffix":
                     UpdateAddWindow addDialog = new UpdateAddWindow(selected);
@@ -180,7 +199,6 @@ namespace BatchRename
                                 ((AddSuffixRuleUI)selected).Suffix = addDialog.Word;
                                 break;
                         }
-                        selected.Update();
                     }
                     break;
                 case "ChangeExtension":
@@ -188,7 +206,6 @@ namespace BatchRename
                     if (extDialog.ShowDialog() == true)
                     {
                         ((ChangeExtRuleUI)selected).Ext = extDialog.Ext;
-                        selected.Update();
                     }
                     break;
                 case "AllUpper":
@@ -199,7 +216,6 @@ namespace BatchRename
                     {
                         if (selected.TYPE == caseDialog.RuleName)
                             return;
-                        rules.RemoveAt(index);
                         presets.RemoveAt(index);
                         switch (caseDialog.RuleName)
                         {
@@ -220,10 +236,10 @@ namespace BatchRename
                     if (replaceDialog.ShowDialog() == true)
                     {
                         ((ReplaceRuleUI)selected).Needles = new List<string>(replaceDialog.Needles);
-                        selected.Update();
                     }
                     break;
             }
+            selected.Update();
         }
 
         private void Add_Preset_Click(object sender, RoutedEventArgs e)
@@ -244,6 +260,17 @@ namespace BatchRename
                                 presets.Add(new AddSuffixRuleUI(addDialog.Word));
                                 break;
                         }
+                    }
+                    break;
+                case "Add Counter":
+                    CounterWindow counterDialog = new CounterWindow();
+                    if(counterDialog.ShowDialog() == true)
+                    {
+                        presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        presets.Add(new AddCounterRuleUI(
+                            counterDialog.Start,
+                            counterDialog.Step,
+                            counterDialog.Digit));
                     }
                     break;
                 case "New Case":
