@@ -11,6 +11,8 @@ using BatchRename.View;
 using BatchRename.DataTypes;
 using System;
 using System.Reflection;
+using Ookii.Dialogs.Wpf;
+using System.Diagnostics;
 
 namespace BatchRename
 {
@@ -19,14 +21,16 @@ namespace BatchRename
     /// </summary>
     public partial class MainWindow : Window
     {
-        BindingList<FileUI> files = new();
-        BindingList<RuleUI> presets = new();
-        List<IRenameRule> rules = new();
         List<string> newNames = new();
+        BindingList<FileUI> files = new BindingList<FileUI>(); // file rename list
+        BindingList<FileUI> folders = new BindingList<FileUI>(); // folder rename list
+        BindingList<RuleUI> presets = new BindingList<RuleUI>();
+        List<IRenameRule> rules = new List<IRenameRule>();
         public MainWindow()
         {
             InitializeComponent();
         }
+
         private void LoadRuleFromUI()
         {
             rules.Clear();
@@ -81,9 +85,14 @@ namespace BatchRename
                 }
             }
             //Load file name to list
-            foreach(var file in files)
+            var arr = files;
+            if (file.IsChecked == true)
+                arr = files;
+            else if (folder.IsChecked == true)
+                arr = folders;
+            foreach(var item in arr)
             {
-                newNames.Add(file.Name);
+                newNames.Add(item.Name);
             }
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -91,16 +100,51 @@ namespace BatchRename
             fileList.ItemsSource = files;
             presetList.ItemsSource = presets;
         }
+        private void File_Active(object sender, RoutedEventArgs e)
+        {
+            if (fileList != null)
+                fileList.ItemsSource = files;
+        }
+        private void Folder_Active(object sender, RoutedEventArgs e)
+        {
+            if (fileList != null)
+                fileList.ItemsSource = folders;
+        }
         private void addFileListView(string[] fileArr)
         {
-            foreach (string file in fileArr)
-                files.Add(new FileUI()
+            var arr = files;
+            if (file.IsChecked == true)
+                arr = files;
+            else if (folder.IsChecked == true)
+                arr = folders;
+            bool check;
+            foreach (string item in fileArr)
+            {
+                Debug.WriteLine(File.Exists(item));
+                check = true;
+                if ((file.IsChecked == true && File.Exists(item) == false) || (folder.IsChecked == true && Directory.Exists(item) == false))
+                    check = false;
+                else
                 {
-                    Name = Path.GetFileName(file),
-                    Path = Path.GetDirectoryName(file),
-                    Preview = Path.GetFileName(file),
+                    //Handling duplication
+                    foreach (FileUI existedItem in arr)
+                    {
+                        if (Path.GetFileName(item) == existedItem.Name && Path.GetDirectoryName(item) == existedItem.Path)
+                        {
+                            check = false;
+                            break;
+                        }
+                    }
+                }
+                if (!check) continue;
+                arr.Add(new FileUI()
+                {
+                    Name = Path.GetFileName(item),
+                    Path = Path.GetDirectoryName(item),
+                    Preview = "",
                     Status = ""
                 });
+            }
         }
         private void Add_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -113,33 +157,52 @@ namespace BatchRename
                     addFileListView(dialog.FileNames);
                 }
             }
+            else if (folder.IsChecked == true)
+            {
+                VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog();
+                dialog.Multiselect = true;
+                if (dialog.ShowDialog() == true)
+                {
+                    addFileListView(dialog.SelectedPaths);
+                }
+            }
         }
         private void Preview_Button_Click(object sender, RoutedEventArgs e)
         {
             LoadRuleFromUI();
+            var arr = files;
+            if (file.IsChecked == true)
+                arr = files;
+            else if (folder.IsChecked == true)
+                arr = folders;
             foreach(var rule in rules)
                 newNames = rule.Rename(newNames);
             for (int i = 0; i < files.Count; i++)
-                files[i].Preview = newNames[i];
+                arr[i].Preview = newNames[i];
         }
         private void Batch_Button_Click(object sender, RoutedEventArgs e)
         {
             LoadRuleFromUI();
-            if (rules.Count == 0 || files.Count == 0) 
+            var arr = files;
+            if (file.IsChecked == true)
+                arr = files;
+            else if (folder.IsChecked == true)
+                arr = folders;
+            if (rules.Count == 0 || arr.Count == 0) 
                 return;
             foreach (var rule in rules)
                 newNames = rule.Rename(newNames);
-            for (int i = 0; i < files.Count; i++)
+            for (int i = 0; i < arr.Count; i++)
             {              
                 try
                 {
-                    File.Move($"{files[i].Path}\\{files[i].Name}", $"{files[i].Path}\\{newNames[i]}");
-                    files[i].Status = "Success";
-                    files[i].Name = newNames[i];
+                    File.Move($"{arr[i].Path}\\{arr[i].Name}", $"{arr[i].Path}\\{newNames[i]}");
+                    arr[i].Status = "Success";
+                    arr[i].Name = newNames[i];
                 }
                 catch (Exception)
                 {
-                    files[i].Status = "Failed";
+                    arr[i].Status = "Failed";
                 }
             }
         }
@@ -241,6 +304,25 @@ namespace BatchRename
             }
             selected.Update();
         }
+        private void Save_Preset_Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Displays a SaveFileDialog so the user can save the current preset.
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Text Documents|*.txt";
+            saveFileDialog.Title = "Save the current preset";
+            saveFileDialog.ShowDialog();
+            // If the file name is not an empty string open it for saving.
+            if (saveFileDialog.FileName != "")
+            {
+                //write all rules in textout
+                string textout = "";
+                foreach (var rule in presets)
+                {
+                    textout = textout + rule.Display + Environment.NewLine;
+                }
+                File.WriteAllText(saveFileDialog.FileName, textout);
+            }
+        }
 
         private void Add_Preset_Click(object sender, RoutedEventArgs e)
         {
@@ -331,12 +413,12 @@ namespace BatchRename
             gView.Columns[2].Width = workingWidth * col3;
             gView.Columns[3].Width = workingWidth * col4;
         }
-
+        //Drag and drop files to the list
         private void HandleFileDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] fileArr = (string[]) e.Data.GetData(DataFormats.FileDrop);
+                string[] fileArr = (string[])e.Data.GetData(DataFormats.FileDrop);
                 addFileListView(fileArr);
             }
         }
@@ -346,24 +428,5 @@ namespace BatchRename
             fileList.Height = fileCard.ActualHeight - fileOptions.ActualHeight;
         }
 
-        private void Save_Preset_Button_Click(object sender, RoutedEventArgs e)
-        {
-            // Displays a SaveFileDialog so the user can save the current preset.
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Text Documents|*.txt";
-            saveFileDialog.Title = "Save the current preset";
-            saveFileDialog.ShowDialog();
-            // If the file name is not an empty string open it for saving.
-            if (saveFileDialog.FileName != "")
-            {
-                //write all rules in textout
-                string textout = "";
-                foreach (var rule in presets)
-                {
-                    textout = textout + rule.Display + Environment.NewLine;
-                }
-                File.WriteAllText(saveFileDialog.FileName, textout);
-            }
-        }
     }
 }

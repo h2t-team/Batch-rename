@@ -116,15 +116,19 @@
                     <StackPanel Orientation="Horizontal">
                         <RadioButton
                           x:Name="file"
+                          GroupName="Method"
                           Margin="16 4 16 4"
                           Style="{DynamicResource MaterialDesignUserForegroundRadioButton}"
                           Content="Rename File" 
-                          IsChecked="True" />        
+                          IsChecked="True" 
+                          Checked="File_Active" />        
                         <RadioButton
                           x:Name="folder"
+                          GroupName="Method"
                           Margin="16 4 16 4"
                           Style="{DynamicResource MaterialDesignUserForegroundRadioButton}"
-                          Content="Rename Folder" />
+                          Content="Rename Folder" 
+                          Checked="Folder_Active" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Grid.Column="2">
                         <Button
