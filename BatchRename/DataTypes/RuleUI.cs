@@ -16,7 +16,6 @@ namespace BatchRename.DataTypes
 
         public abstract void Update();
     }
-
     public class AddCounterRuleUI : RuleUI
     {
         public int Start { set; get; }
