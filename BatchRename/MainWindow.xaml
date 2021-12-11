@@ -27,6 +27,7 @@
         <ToolBarTray Grid.ColumnSpan="2" Margin="0 0 0 5" VerticalAlignment="Center">
             <ToolBar Style="{DynamicResource MaterialDesignToolBar}" ClipToBounds="False">
                 <Button Style="{StaticResource MaterialDesignFlatDarkButton}"
+                        Click="Open_Preset_Button_Click"
                     ToolTip="Open a preset">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="FileDocumentMultiple" VerticalAlignment="Center"/>
