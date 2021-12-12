@@ -13,6 +13,8 @@ using System;
 using System.Reflection;
 using Ookii.Dialogs.Wpf;
 using System.Diagnostics;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace BatchRename
 {
@@ -26,7 +28,16 @@ namespace BatchRename
         BindingList<FileUI> folders = new BindingList<FileUI>(); // folder rename list
         BindingList<RuleUI> presets = new BindingList<RuleUI>();
         List<IRenameRule> rules = new List<IRenameRule>();
-        public MainWindow()
+        List<string> actions = new List<string>
+        {
+            "Replace",
+            "Add Counter",
+            "New Case",
+            "Change Extension",
+            "Trim",
+        };
+        BindingList<string> actionsUI = new BindingList<string>();
+public MainWindow()
         {
             InitializeComponent();
         }
@@ -36,7 +47,7 @@ namespace BatchRename
             rules.Clear();
             newNames.Clear();
             //Load rule dynamically
-            foreach(var preset in presets)
+            foreach (var preset in presets)
             {
                 string exePath = Assembly.GetExecutingAssembly().Location;
                 string folder = Path.GetDirectoryName(exePath);
@@ -55,8 +66,8 @@ namespace BatchRename
                             }) as IRenameRule);
                             break;
                         case "AddPrefix":
-                            rules.Add(Activator.CreateInstance(type, new object[] { 
-                                ((AddPrefixRuleUI)preset).Prefix 
+                            rules.Add(Activator.CreateInstance(type, new object[] {
+                                ((AddPrefixRuleUI)preset).Prefix
                             }) as IRenameRule);
                             break;
                         case "AddSuffix":
@@ -71,7 +82,7 @@ namespace BatchRename
                             break;
                         case "Replace":
                             rules.Add(Activator.CreateInstance(type, new object[] {
-                                ((ReplaceRuleUI)preset).Needles, 
+                                ((ReplaceRuleUI)preset).Needles,
                                 ((ReplaceRuleUI)preset).Replacer
                             }) as IRenameRule);
                             break;
@@ -81,7 +92,7 @@ namespace BatchRename
                         case "Trim":
                             rules.Add(Activator.CreateInstance(type) as IRenameRule);
                             break;
-                    }   
+                    }
                 }
             }
             //Load file name to list
@@ -90,7 +101,7 @@ namespace BatchRename
                 arr = files;
             else if (folder.IsChecked == true)
                 arr = folders;
-            foreach(var item in arr)
+            foreach (var item in arr)
             {
                 newNames.Add(item.Name);
             }
@@ -99,6 +110,8 @@ namespace BatchRename
         {
             fileList.ItemsSource = files;
             presetList.ItemsSource = presets;
+            actionsUI = new BindingList<string>(actions.ToList());  
+            presetComboBox.ItemsSource = actionsUI;
         }
         private void File_Active(object sender, RoutedEventArgs e)
         {
@@ -175,9 +188,9 @@ namespace BatchRename
                 arr = files;
             else if (folder.IsChecked == true)
                 arr = folders;
-            foreach(var rule in rules)
+            foreach (var rule in rules)
                 newNames = rule.Rename(newNames);
-            for (int i = 0; i < arr.Count; i++) 
+            for (int i = 0; i < arr.Count; i++)
                 arr[i].Preview = newNames[i];
             arr.ResetBindings();
         }
@@ -189,15 +202,15 @@ namespace BatchRename
                 arr = files;
             else if (folder.IsChecked == true)
                 arr = folders;
-            if (rules.Count == 0 || arr.Count == 0) 
+            if (rules.Count == 0 || arr.Count == 0)
                 return;
             foreach (var rule in rules)
                 newNames = rule.Rename(newNames);
             for (int i = 0; i < arr.Count; i++)
-            {              
+            {
                 try
                 {
-                    if(file.IsChecked == true)
+                    if (file.IsChecked == true)
                         File.Move($"{arr[i].Path}\\{arr[i].Name}", $"{arr[i].Path}\\{newNames[i]}");
                     else if (folder.IsChecked == true)
                         Directory.Move($"{arr[i].Path}\\{arr[i].Name}", $"{arr[i].Path}\\{newNames[i]}");
@@ -223,7 +236,7 @@ namespace BatchRename
                     presetComboBox.Items.Add(new ComboBoxItem() { Content = "Add Counter" });
                     break;
                 case "Trim":
-                    presetComboBox.Items.Add(new ComboBoxItem() { Content="Trim" });
+                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "Trim" });
                     break;
                 case "AllLower":
                 case "AllUpper":
@@ -246,7 +259,7 @@ namespace BatchRename
             {
                 case "AddCounter":
                     UpdateCounterWindow counterDialog = new UpdateCounterWindow(selected);
-                    if(counterDialog.ShowDialog()== true)
+                    if (counterDialog.ShowDialog() == true)
                     {
                         ((AddCounterRuleUI)selected).Start = counterDialog.Start;
                         ((AddCounterRuleUI)selected).Step = counterDialog.Step;
@@ -292,7 +305,7 @@ namespace BatchRename
                                 break;
                             case "AllLower":
                                 presets.Insert(index, new AllLowerRuleUI());
-                                break;   
+                                break;
                             case "PascalCase":
                                 presets.Insert(index, new PascalCaseRuleUI());
                                 break;
@@ -331,12 +344,12 @@ namespace BatchRename
 
         private void Add_Preset_Click(object sender, RoutedEventArgs e)
         {
-            string option = presetComboBox.Text;
+            string option =presetComboBox.Text;
             switch (option)
             {
                 case "Add":
                     AddWindow addDialog = new AddWindow();
-                    if(addDialog.ShowDialog() == true)
+                    if (addDialog.ShowDialog() == true)
                     {
                         switch (addDialog.RuleName)
                         {
@@ -351,7 +364,7 @@ namespace BatchRename
                     break;
                 case "Add Counter":
                     CounterWindow counterDialog = new CounterWindow();
-                    if(counterDialog.ShowDialog() == true)
+                    if (counterDialog.ShowDialog() == true)
                     {
                         presetComboBox.Items.Remove(presetComboBox.SelectedItem);
                         presets.Add(new AddCounterRuleUI(
@@ -380,14 +393,16 @@ namespace BatchRename
                     }
                     break;
                 case "Trim":
-                    presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                    //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                    actionsUI.Remove("Trim");
                     presets.Add(new TrimRuleUI());
                     break;
                 case "Change Extension":
                     ExtensionWindow extDialog = new ExtensionWindow();
                     if (extDialog.ShowDialog() == true)
                     {
-                        presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        actionsUI.Remove("Change Extension");
                         presets.Add(new ChangeExtRuleUI(extDialog.Ext));
                     }
                     break;
@@ -407,7 +422,7 @@ namespace BatchRename
             ListView listView = sender as ListView;
             GridView gView = listView.View as GridView;
 
-            var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth; 
+            var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth;
             var col1 = 0.3;
             var col2 = 0.3;
             var col3 = 0.2;
@@ -435,10 +450,11 @@ namespace BatchRename
 
         private void Open_Preset_Button_Click(object sender, RoutedEventArgs e)
         {
-            presets.Clear();
             OpenFileDialog dialog = new OpenFileDialog();
             if (dialog.ShowDialog() == true)
             {
+                ShowAllActions();
+                presets.Clear();
                 string filename = dialog.FileName;
                 string[] filelines = File.ReadAllLines(filename);
                 for (int i = 0; i < filelines.Length; i++)
@@ -461,9 +477,9 @@ namespace BatchRename
                         case "Add Counter":
                             tokens = line.Split(new string[] { "Add Counter: " }, StringSplitOptions.None);
                             parts = tokens[1].Split(new string[] { " " }, StringSplitOptions.None);
-                            int start = int.Parse(parts[0].Substring(1,parts[0].Length-1));
-                            int step = int.Parse(parts[1].Substring(1, parts[1].Length-1));
-                            int digit = int.Parse(parts[2].Substring(1, parts[2].Length-1));
+                            int start = int.Parse(parts[0].Substring(1, parts[0].Length - 1));
+                            int step = int.Parse(parts[1].Substring(1, parts[1].Length - 1));
+                            int digit = int.Parse(parts[2].Substring(1, parts[2].Length - 1));
                             presets.Add(new AddCounterRuleUI(start, step, digit));
                             break;
                         case "Add Prefix":
@@ -480,7 +496,7 @@ namespace BatchRename
                             tokens = line.Split(new string[] { "Change Extension: " }, StringSplitOptions.None);
                             string ext = tokens[1];
                             presets.Add(new ChangeExtRuleUI(ext));
-                            //RemovePresetItem("Change Extension");
+                            actionsUI.Remove("Change Extension");
                             break;
                         case "Replace":
                             tokens = line.Split(new string[] { "Replace: " }, StringSplitOptions.None);
@@ -499,23 +515,17 @@ namespace BatchRename
                         case "PascalCase":
                         case "Trim":
                             presets.Add(new TrimRuleUI());
-                            //RemovePresetItem("Trim");
+                            actionsUI.Remove("Trim");
                             break;
                     }
                 }
             }
         }
-        //Neu open preset khac se ko co item nay
-        //private void RemovePresetItem(string presetName)
-        //{
-        //    foreach (ComboBoxItem cmbItem in presetComboBox.Items)
-        //    {
-        //        if (cmbItem.Content.ToString() == presetName)
-        //        {
-        //            presetComboBox.Items.Remove(cmbItem);
-        //            break;
-        //        }
-        //    }
-        //}
+        //When open another preset => all actions are shown again 
+        private void ShowAllActions()
+        {
+            actionsUI = new BindingList<string>(actions.ToList());
+            presetComboBox.ItemsSource = actionsUI;
+        }
     }
 }
