@@ -93,7 +93,8 @@
                             </ListView.Resources>
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListViewItem}" >
-                                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}"/>
+                                    <Setter Property="ContextMenu" 
+                                            Value="{StaticResource ItemContextMenu}"/>
                                 </Style>
                             </ListView.ItemContainerStyle>
                         </ListView>
@@ -172,11 +173,18 @@
                           SizeChanged="ListView_SizeChanged"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ScrollViewer.CanContentScroll="False">
+                    <ListView.Resources>
+                        <ContextMenu x:Key="ItemContextMenu">
+                            <MenuItem Header="Delete" Click="Delete_File_Click"/>
+                        </ContextMenu>
+                    </ListView.Resources>
                     <ListView.Style>
                         <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource MaterialDesignListView}">
                             <Setter Property="OverridesDefaultStyle" Value="True" />
                             <Setter Property="BorderThickness" Value="10,10,10,10" />
                             <Setter Property="Padding" Value="5" />
+                            <Setter Property="ContextMenu" 
+                                    Value="{StaticResource ItemContextMenu}"/>
                         </Style>
                     </ListView.Style>
                     <ListView.View>
@@ -195,6 +203,7 @@
                                 DisplayMemberBinding="{Binding Status}"/>
                         </GridView>
                     </ListView.View>
+                    
                 </ListView>
             </StackPanel>
         </materialDesign:Card>

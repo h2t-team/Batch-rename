@@ -505,6 +505,20 @@ namespace BatchRename
                 }
             }
         }
+
+        private void Delete_File_Click(object sender, RoutedEventArgs e)
+        {
+            int index = fileList.SelectedIndex;
+            if (index == -1)
+                return;
+            if (file.IsChecked == true)
+            {
+                files.RemoveAt(index);
+            } else if (folder.IsChecked == true)
+            {
+                folders.RemoveAt(index);
+            }
+        }
         //Neu open preset khac se ko co item nay
         //private void RemovePresetItem(string presetName)
         //{
