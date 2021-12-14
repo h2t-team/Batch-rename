@@ -31,13 +31,14 @@ namespace BatchRename
         List<string> actions = new List<string>
         {
             "Replace",
+            "Add",
             "Add Counter",
             "New Case",
             "Change Extension",
             "Trim",
         };
         BindingList<string> actionsUI = new BindingList<string>();
-public MainWindow()
+        public MainWindow()
         {
             InitializeComponent();
         }
