@@ -537,5 +537,19 @@ public MainWindow()
             actionsUI = new BindingList<string>(actions.ToList());
             presetComboBox.ItemsSource = actionsUI;
         }
+
+        private void Delete_File_Click(object sender, RoutedEventArgs e)
+        {
+            int index = fileList.SelectedIndex;
+            if (index == -1)
+                return;
+            if (file.IsChecked == true)
+            {
+                files.RemoveAt(index);
+            } else if (folder.IsChecked == true)
+            {
+                folders.RemoveAt(index);
+            }
+        }     
     }
 }
