@@ -234,18 +234,22 @@ public MainWindow()
             switch (selected.TYPE)
             {
                 case "AddCounter":
-                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "Add Counter" });
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Add Counter" });
+                    actionsUI.Add("Add Counter");
                     break;
                 case "Trim":
-                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "Trim" });
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Trim" });
+                    actionsUI.Add("Trim");
                     break;
                 case "AllLower":
                 case "AllUpper":
                 case "PascalCase":
-                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "New Case" });
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "New Case" });
+                    actionsUI.Add("New Case");
                     break;
                 case "ChangeExtension":
-                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "Change Extension" });
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Change Extension" });
+                    actionsUI.Add("Change Extension");
                     break;
             }
             presets.RemoveAt(index);
@@ -515,13 +519,9 @@ public MainWindow()
                             presets.Add(new ReplaceRuleUI(needles, replacement));
                             break;
                         case "All Upper":
-                            actionsUI.Remove("All Upper");
-                            break;
                         case "All Lower":
-                            actionsUI.Remove("All Lower");
-                            break;
                         case "Pascal Case":
-                            actionsUI.Remove("Pascal Case");
+                            actionsUI.Remove("New Case");
                             break;
                         case "Trim":
                             presets.Add(new TrimRuleUI());
