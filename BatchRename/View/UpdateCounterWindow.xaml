@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BatchRename.View"
+        xmlns:local="clr-namespace:BatchRename"
         mc:Ignorable="d"
         Title="Add Counter Rules" Height="150" Width="400" ResizeMode="NoResize"
         Loaded="Window_Loaded"
@@ -30,33 +30,57 @@
                 x:Name="StartTxt"
                 FontSize="14"
                 Padding="5 2"
-                Text="{Binding Start}"
                 materialDesign:HintAssist.Hint="Start"
                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                 materialDesign:TransitionAssist.DisableTransitions="True" 
-                Margin="15 10"></TextBox>
+                Margin="15 10">
+                <TextBox.Text>
+                    <Binding Path="Start" ValidatesOnDataErrors="True"
+                    UpdateSourceTrigger="PropertyChanged" >
+                        <Binding.ValidationRules>
+                            <local:OnlyNumberRule></local:OnlyNumberRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
         </StackPanel>
         <StackPanel VerticalAlignment="Center" Grid.Column="1">
             <TextBox
                 x:Name="StepTxt"
                 FontSize="14"
                 Padding="5 2"
-                Text="{Binding Step}"
                 materialDesign:HintAssist.Hint="Step"
                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                 materialDesign:TransitionAssist.DisableTransitions="True" 
-                Margin="15 10"></TextBox>
+                Margin="15 10">
+                <TextBox.Text>
+                    <Binding Path="Step" ValidatesOnDataErrors="True"
+                    UpdateSourceTrigger="PropertyChanged" >
+                        <Binding.ValidationRules>
+                            <local:OnlyNumberRule></local:OnlyNumberRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
         </StackPanel>
         <StackPanel VerticalAlignment="Center" Grid.Column="2">
             <TextBox
                 x:Name="DigitTxt"
                 FontSize="14"
                 Padding="5 2"
-                Text="{Binding Digit}"
                 materialDesign:HintAssist.Hint="Digit"
                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                 materialDesign:TransitionAssist.DisableTransitions="True" 
-                Margin="15 10"></TextBox>
+                Margin="15 10">
+                <TextBox.Text>
+                    <Binding Path="Digit" ValidatesOnDataErrors="True"
+                    UpdateSourceTrigger="PropertyChanged" >
+                        <Binding.ValidationRules>
+                            <local:OnlyNumberRule></local:OnlyNumberRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="1" Margin="0 0 10 5" Grid.ColumnSpan="2">
             <Button

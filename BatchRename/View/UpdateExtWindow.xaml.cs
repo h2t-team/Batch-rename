@@ -1,6 +1,7 @@
 ﻿using BatchRename.DataTypes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace BatchRename.View
     /// <summary>
     /// Interaction logic for UpdateExtWindow.xaml
     /// </summary>
-    public partial class UpdateExtWindow : Window
+    public partial class UpdateExtWindow : Window, INotifyPropertyChanged
     {
         public string Ext { get; set; }
         public UpdateExtWindow(RuleUI rule)
@@ -26,6 +27,9 @@ namespace BatchRename.View
             InitializeComponent();
             Ext = ((ChangeExtRuleUI)rule).Ext;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             DataContext = this;

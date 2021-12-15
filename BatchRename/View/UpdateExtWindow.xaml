@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BatchRename.View"
+        xmlns:local="clr-namespace:BatchRename"
         mc:Ignorable="d"
         Title="Chang Extension Rules" Height="150" Width="400" ResizeMode="NoResize"
         Loaded="Window_Loaded"
@@ -30,11 +30,19 @@
                 x:Name="ExtTxt"
                 FontSize="14"
                 Padding="5 2"
-                Text="{Binding Path=Ext}"
                 materialDesign:HintAssist.Hint="Extension to change"
                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                 materialDesign:TransitionAssist.DisableTransitions="True" 
-                Margin="15 10"/>
+                Margin="15 10">
+                <TextBox.Text>
+                    <Binding Path="Ext" ValidatesOnDataErrors="True"
+                    UpdateSourceTrigger="PropertyChanged" >
+                        <Binding.ValidationRules>
+                            <local:NoSpecialCharRule></local:NoSpecialCharRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1" Margin="0 0 0 5">
             <Button

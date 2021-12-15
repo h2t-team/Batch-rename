@@ -8,10 +8,13 @@ namespace BatchRename.View
     /// <summary>
     /// Interaction logic for ReplaceWindow.xaml
     /// </summary>
-    public partial class ReplaceWindow : Window
+    public partial class ReplaceWindow : Window, INotifyPropertyChanged
     {
         private BindingList<string> wordBinding = new BindingList<string>();
         public List<string> Needles = new List<string>();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string Replacer { set; get; }
         public ReplaceWindow()
         {
@@ -20,6 +23,7 @@ namespace BatchRename.View
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             wordList.ItemsSource = wordBinding;
+            DataContext = this;
         }
         private void Add_Button_Click(object sender, RoutedEventArgs e)
         {

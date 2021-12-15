@@ -10,6 +10,14 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <ControlTemplate x:Key="errorTemplate">
+                <StackPanel Orientation="Vertical">
+                    <Border BorderBrush="OrangeRed" BorderThickness="2">
+                        <AdornedElementPlaceholder/>
+                    </Border>
+                    <TextBlock Foreground="OrangeRed" Margin="0,0,4,0" Text="{Binding [0].ErrorContent}"></TextBlock>
+                </StackPanel>
+            </ControlTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

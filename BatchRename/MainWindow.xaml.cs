@@ -30,10 +30,11 @@ namespace BatchRename
         List<IRenameRule> rules = new List<IRenameRule>();
         List<string> actions = new List<string>
         {
-            "Replace",
+            "Add",
             "Add Counter",
-            "New Case",
             "Change Extension",
+            "New Case",
+            "Replace",
             "Trim",
         };
         BindingList<string> actionsUI = new BindingList<string>();
@@ -110,7 +111,7 @@ public MainWindow()
         {
             fileList.ItemsSource = files;
             presetList.ItemsSource = presets;
-            actionsUI = new BindingList<string>(actions.ToList());  
+            actionsUI = new BindingList<string>(actions.ToList());
             presetComboBox.ItemsSource = actionsUI;
         }
         private void File_Active(object sender, RoutedEventArgs e)
@@ -366,7 +367,8 @@ public MainWindow()
                     CounterWindow counterDialog = new CounterWindow();
                     if (counterDialog.ShowDialog() == true)
                     {
-                        presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        actionsUI.Remove("Add Counter");
                         presets.Add(new AddCounterRuleUI(
                             counterDialog.Start,
                             counterDialog.Step,
@@ -377,7 +379,8 @@ public MainWindow()
                     CaseWindow caseDialog = new CaseWindow();
                     if (caseDialog.ShowDialog() == true)
                     {
-                        presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        actionsUI.Remove("New Case");
                         switch (caseDialog.RuleName)
                         {
                             case "All Upper Case":
@@ -481,6 +484,7 @@ public MainWindow()
                             int step = int.Parse(parts[1].Substring(1, parts[1].Length - 1));
                             int digit = int.Parse(parts[2].Substring(1, parts[2].Length - 1));
                             presets.Add(new AddCounterRuleUI(start, step, digit));
+                            actionsUI.Remove("Add Counter");
                             break;
                         case "Add Prefix":
                             tokens = line.Split(new string[] { "Add Prefix: " }, StringSplitOptions.None);
@@ -510,9 +514,15 @@ public MainWindow()
                             string replacement = parts[1].Substring(1, parts[1].Length - 2);
                             presets.Add(new ReplaceRuleUI(needles, replacement));
                             break;
-                        case "AllUpper":
-                        case "AllLower":
-                        case "PascalCase":
+                        case "All Upper":
+                            actionsUI.Remove("All Upper");
+                            break;
+                        case "All Lower":
+                            actionsUI.Remove("All Lower");
+                            break;
+                        case "Pascal Case":
+                            actionsUI.Remove("Pascal Case");
+                            break;
                         case "Trim":
                             presets.Add(new TrimRuleUI());
                             actionsUI.Remove("Trim");

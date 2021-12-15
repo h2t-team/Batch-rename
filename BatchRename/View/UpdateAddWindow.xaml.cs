@@ -1,4 +1,5 @@
 ﻿using BatchRename.DataTypes;
+using System.ComponentModel;
 using System.Windows;
 
 namespace BatchRename.View
@@ -6,7 +7,7 @@ namespace BatchRename.View
     /// <summary>
     /// Interaction logic for UpdateAddWindow.xaml
     /// </summary>
-    public partial class UpdateAddWindow : Window
+    public partial class UpdateAddWindow : Window, INotifyPropertyChanged
     {
         public string RuleName { get; set; }
         public string Word { get; set; }
@@ -25,6 +26,8 @@ namespace BatchRename.View
                     break;
             }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
