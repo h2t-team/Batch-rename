@@ -86,9 +86,26 @@
             <Button
                 Click="Confirm_Button_Click"
                 Margin="5"
-                Style="{StaticResource MaterialDesignRaisedLightButton}"
-                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" 
-                Content="Confirm"/>
+                Content="Confirm">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedLightButton}">
+                        <Setter Property="IsEnabled" Value="False"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=StartTxt}" Value="False"/>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=StepTxt}" Value="False"/>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=DigitTxt}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="IsEnabled" Value="True"/>
+                            </MultiDataTrigger>
+                            <DataTrigger  Binding="{Binding Text, ElementName=DigitTxt}" Value="0">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
             <Button
                 Click="Cancel_Button_Click"
                 Margin="5"
