@@ -16,8 +16,9 @@
         TextOptions.TextRenderingMode="Auto"
         Name="Main"
         Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}">
-    <Grid>
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        WindowStartupLocation="Manual">
+    <Grid MouseMove="AutoSave_Condition">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="5*" />

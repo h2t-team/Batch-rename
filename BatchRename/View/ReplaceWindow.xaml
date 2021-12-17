@@ -89,7 +89,7 @@
                 Margin="5"
                 Style="{StaticResource MaterialDesignRaisedLightButton}"
                 IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" 
-                Content="Confirm"/>
+                Content="Confirm"></Button>
             <Button
                 Click="Cancel_Button_Click"
                 Margin="5"

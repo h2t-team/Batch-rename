@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using RenameLib;
 using System.Linq;
 using System.Windows.Controls;
-
 using BatchRename.View;
 using BatchRename.DataTypes;
 using System;
@@ -15,6 +14,7 @@ using Ookii.Dialogs.Wpf;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Globalization;
+using System.Windows.Threading;
 
 namespace BatchRename
 {
@@ -39,6 +39,8 @@ namespace BatchRename
             "Trim",
         };
         BindingList<string> actionsUI = new BindingList<string>();
+        string stateFile = "LastTimeState.bin";  //last time state filename
+        string autoSaveFile = "AutoSaveFile.bin"; // autosave filename
         public MainWindow()
         {
             InitializeComponent();
@@ -114,6 +116,44 @@ namespace BatchRename
             presetList.ItemsSource = presets;
             actionsUI = new BindingList<string>(actions.ToList());
             presetComboBox.ItemsSource = actionsUI;
+
+            // load the last time state 
+            if (File.Exists(stateFile))
+            {
+                string[] filelines = File.ReadAllLines(stateFile);
+                string[] tokens;
+                string line, type;
+
+                // load the size of the screen
+                type = filelines[0].Substring(0, filelines[0].IndexOf(':'));
+                if (type == "Size")
+                {
+                    line = filelines[0].Substring(filelines[0].IndexOf(':') + 2);
+                    tokens = line.Split(new string[] { " " }, StringSplitOptions.None);
+                    Main.Width = double.Parse(tokens[0]);
+                    Main.Height = double.Parse(tokens[1]);
+                }
+
+                // load the location of the screen
+                type = filelines[1].Substring(0, filelines[1].IndexOf(':'));
+                if (type == "Location")
+                {
+                    line = filelines[1].Substring(filelines[1].IndexOf(':') + 2);
+                    tokens = line.Split(new string[] { " " }, StringSplitOptions.None);
+                    Main.Top = double.Parse(tokens[0]);
+                    Main.Left = double.Parse(tokens[1]);
+                }
+
+                filelines = filelines.Skip(2).ToArray();
+                loadPreset(filelines);
+            }
+
+            // load the working condition
+            if (File.Exists(autoSaveFile))
+            {
+                string[] filelines = File.ReadAllLines(autoSaveFile);
+                string[] tokens;
+            }
         }
         private void File_Active(object sender, RoutedEventArgs e)
         {
@@ -465,71 +505,7 @@ namespace BatchRename
                 presets.Clear();
                 string filename = dialog.FileName;
                 string[] filelines = File.ReadAllLines(filename);
-                for (int i = 0; i < filelines.Length; i++)
-                {
-                    string line = filelines[i];
-                    int firstColonIndex = line.IndexOf(":");
-                    string type = "";
-                    if (firstColonIndex > 0)
-                    {
-                        type = line.Substring(0, firstColonIndex);
-                    }
-                    else
-                    {
-                        type = line;
-                    }
-                    string[] tokens;
-                    string[] parts;
-                    switch (type)
-                    {
-                        case "Add Counter":
-                            tokens = line.Split(new string[] { "Add Counter: " }, StringSplitOptions.None);
-                            parts = tokens[1].Split(new string[] { " " }, StringSplitOptions.None);
-                            int start = int.Parse(parts[0].Substring(1, parts[0].Length - 1));
-                            int step = int.Parse(parts[1].Substring(1, parts[1].Length - 1));
-                            int digit = int.Parse(parts[2].Substring(1, parts[2].Length - 1));
-                            presets.Add(new AddCounterRuleUI(start, step, digit));
-                            actionsUI.Remove("Add Counter");
-                            break;
-                        case "Add Prefix":
-                            tokens = line.Split(new string[] { "Add Prefix: " }, StringSplitOptions.None);
-                            string prefix = tokens[1];
-                            presets.Add(new AddPrefixRuleUI(prefix));
-                            break;
-                        case "Add Suffix":
-                            tokens = line.Split(new string[] { "Add Suffix: " }, StringSplitOptions.None);
-                            string suffix = tokens[1];
-                            presets.Add(new AddSuffixRuleUI(suffix));
-                            break;
-                        case "Change Extension":
-                            tokens = line.Split(new string[] { "Change Extension: " }, StringSplitOptions.None);
-                            string ext = tokens[1];
-                            presets.Add(new ChangeExtRuleUI(ext));
-                            actionsUI.Remove("Change Extension");
-                            break;
-                        case "Replace":
-                            tokens = line.Split(new string[] { "Replace: " }, StringSplitOptions.None);
-                            parts = tokens[1].Split(new string[] { " => " }, StringSplitOptions.None);
-                            string[] words = parts[0].Substring(1, parts[0].Length - 2).Split(new string[] { ", " }, StringSplitOptions.None);
-                            List<string> needles = new List<string>();
-                            foreach (string word in words)
-                            {
-                                needles.Add(word.Substring(1, word.Length - 2));
-                            }
-                            string replacement = parts[1].Substring(1, parts[1].Length - 2);
-                            presets.Add(new ReplaceRuleUI(needles, replacement));
-                            break;
-                        case "All Upper":
-                        case "All Lower":
-                        case "Pascal Case":
-                            actionsUI.Remove("New Case");
-                            break;
-                        case "Trim":
-                            presets.Add(new TrimRuleUI());
-                            actionsUI.Remove("Trim");
-                            break;
-                    }
-                }
+                loadPreset(filelines);
             }
         }
         //When open another preset => all actions are shown again 
@@ -554,8 +530,125 @@ namespace BatchRename
         }     
         private void Window_Closed(object sender, EventArgs e)
         {
+            // get current size
             double width = Main.Width;
             double height = Main.Height;
+
+            // get current location
+            double top = Main.Top;
+            double left = Main.Left;
+
+            //write the sizes and locations into the file
+            string textout = "";
+            textout += $"Size: {width} {height}" + Environment.NewLine;
+            textout += $"Location: {top} {left}" + Environment.NewLine;
+            File.WriteAllText(stateFile, textout);
+        }
+        void loadPreset(string[] filelines)
+        {
+            for (int i = 0; i < filelines.Length; i++)
+            {
+                string line = filelines[i];
+                int firstColonIndex = line.IndexOf(":");
+                string type = "";
+                if (firstColonIndex > 0)
+                {
+                    type = line.Substring(0, firstColonIndex);
+                }
+                else
+                {
+                    type = line;
+                }
+                string[] tokens;
+                string[] parts;
+                switch (type)
+                {
+                    case "Add Counter":
+                        tokens = line.Split(new string[] { "Add Counter: " }, StringSplitOptions.None);
+                        parts = tokens[1].Split(new string[] { " " }, StringSplitOptions.None);
+                        int start = int.Parse(parts[0].Substring(1, parts[0].Length - 1));
+                        int step = int.Parse(parts[1].Substring(1, parts[1].Length - 1));
+                        int digit = int.Parse(parts[2].Substring(1, parts[2].Length - 1));
+                        presets.Add(new AddCounterRuleUI(start, step, digit));
+                        actionsUI.Remove("Add Counter");
+                        break;
+                    case "Add Prefix":
+                        tokens = line.Split(new string[] { "Add Prefix: " }, StringSplitOptions.None);
+                        string prefix = tokens[1];
+                        presets.Add(new AddPrefixRuleUI(prefix));
+                        break;
+                    case "Add Suffix":
+                        tokens = line.Split(new string[] { "Add Suffix: " }, StringSplitOptions.None);
+                        string suffix = tokens[1];
+                        presets.Add(new AddSuffixRuleUI(suffix));
+                        break;
+                    case "Change Extension":
+                        tokens = line.Split(new string[] { "Change Extension: " }, StringSplitOptions.None);
+                        string ext = tokens[1];
+                        presets.Add(new ChangeExtRuleUI(ext));
+                        actionsUI.Remove("Change Extension");
+                        break;
+                    case "Replace":
+                        tokens = line.Split(new string[] { "Replace: " }, StringSplitOptions.None);
+                        parts = tokens[1].Split(new string[] { " => " }, StringSplitOptions.None);
+                        string[] words = parts[0].Substring(1, parts[0].Length - 2).Split(new string[] { ", " }, StringSplitOptions.None);
+                        List<string> needles = new List<string>();
+                        foreach (string word in words)
+                        {
+                            needles.Add(word.Substring(1, word.Length - 2));
+                        }
+                        string replacement = parts[1].Substring(1, parts[1].Length - 2);
+                        presets.Add(new ReplaceRuleUI(needles, replacement));
+                        break;
+                    case "All Upper":
+                    case "All Lower":
+                    case "Pascal Case":
+                        actionsUI.Remove("New Case");
+                        break;
+                    case "Trim":
+                        presets.Add(new TrimRuleUI());
+                        actionsUI.Remove("Trim");
+                        break;
+                }
+            }
+        }
+        private void AutoSaveFile()
+        {
+            string textout = "";
+
+            //auto the save the current file list
+            textout += "~Files:" + Environment.NewLine;
+            foreach (FileUI file in files)
+            {
+                textout += file.Name + "|" + file.Path;
+                textout += Environment.NewLine;
+            }
+
+            textout += "~Folders:" + Environment.NewLine;
+            foreach (FileUI folder in folders)
+            {
+                textout += folder.Name + "|" + folder.Path;
+                textout += Environment.NewLine;
+            }
+
+            // auto save the current set of renaming rules, together with the parameters
+            textout += "~Rules: " + Environment.NewLine;
+            foreach (RuleUI rule in presets)
+            {
+                textout = textout + rule.Display + Environment.NewLine;
+            }
+            File.WriteAllText(autoSaveFile, textout);
+        }
+
+        private void AutoSave_Condition(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(1) };
+            timer.Start();
+            timer.Tick += (sender, args) =>
+            {
+                timer.Stop();
+                AutoSaveFile();
+            };
         }
     }
 }
