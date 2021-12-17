@@ -9,9 +9,12 @@ namespace BatchRename.View
     /// <summary>
     /// Interaction logic for UpdateCaseWindow.xaml
     /// </summary>
-    public partial class UpdateCaseWindow : Window
+    public partial class UpdateCaseWindow : Window, INotifyPropertyChanged
     {
         private readonly BindingList<KeyValuePair<string, string>> rules = new();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string RuleName { get; set; }
         public UpdateCaseWindow(RuleUI rule)
         {

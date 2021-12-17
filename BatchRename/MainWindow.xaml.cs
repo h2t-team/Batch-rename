@@ -33,8 +33,9 @@ namespace BatchRename
             "Replace",
             "Add",
             "Add Counter",
-            "New Case",
             "Change Extension",
+            "New Case",
+            "Replace",
             "Trim",
         };
         BindingList<string> actionsUI = new BindingList<string>();
@@ -111,7 +112,7 @@ namespace BatchRename
         {
             fileList.ItemsSource = files;
             presetList.ItemsSource = presets;
-            actionsUI = new BindingList<string>(actions.ToList());  
+            actionsUI = new BindingList<string>(actions.ToList());
             presetComboBox.ItemsSource = actionsUI;
         }
         private void File_Active(object sender, RoutedEventArgs e)
@@ -234,18 +235,22 @@ namespace BatchRename
             switch (selected.TYPE)
             {
                 case "AddCounter":
-                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "Add Counter" });
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Add Counter" });
+                    actionsUI.Add("Add Counter");
                     break;
                 case "Trim":
-                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "Trim" });
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Trim" });
+                    actionsUI.Add("Trim");
                     break;
                 case "AllLower":
                 case "AllUpper":
                 case "PascalCase":
-                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "New Case" });
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "New Case" });
+                    actionsUI.Add("New Case");
                     break;
                 case "ChangeExtension":
-                    presetComboBox.Items.Add(new ComboBoxItem() { Content = "Change Extension" });
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Change Extension" });
+                    actionsUI.Add("Change Extension");
                     break;
             }
             presets.RemoveAt(index);
@@ -367,7 +372,8 @@ namespace BatchRename
                     CounterWindow counterDialog = new CounterWindow();
                     if (counterDialog.ShowDialog() == true)
                     {
-                        presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        actionsUI.Remove("Add Counter");
                         presets.Add(new AddCounterRuleUI(
                             counterDialog.Start,
                             counterDialog.Step,
@@ -378,7 +384,8 @@ namespace BatchRename
                     CaseWindow caseDialog = new CaseWindow();
                     if (caseDialog.ShowDialog() == true)
                     {
-                        presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
+                        actionsUI.Remove("New Case");
                         switch (caseDialog.RuleName)
                         {
                             case "All Upper Case":
@@ -482,6 +489,7 @@ namespace BatchRename
                             int step = int.Parse(parts[1].Substring(1, parts[1].Length - 1));
                             int digit = int.Parse(parts[2].Substring(1, parts[2].Length - 1));
                             presets.Add(new AddCounterRuleUI(start, step, digit));
+                            actionsUI.Remove("Add Counter");
                             break;
                         case "Add Prefix":
                             tokens = line.Split(new string[] { "Add Prefix: " }, StringSplitOptions.None);
@@ -511,9 +519,11 @@ namespace BatchRename
                             string replacement = parts[1].Substring(1, parts[1].Length - 2);
                             presets.Add(new ReplaceRuleUI(needles, replacement));
                             break;
-                        case "AllUpper":
-                        case "AllLower":
-                        case "PascalCase":
+                        case "All Upper":
+                        case "All Lower":
+                        case "Pascal Case":
+                            actionsUI.Remove("New Case");
+                            break;
                         case "Trim":
                             presets.Add(new TrimRuleUI());
                             actionsUI.Remove("Trim");
