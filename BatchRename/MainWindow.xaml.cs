@@ -433,5 +433,10 @@ namespace BatchRename
             fileList.Height = fileCard.ActualHeight - fileOptions.ActualHeight;
         }
 
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            double width = Main.Width;
+            double height = Main.Height;
+        }
     }
 }
