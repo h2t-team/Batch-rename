@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BatchRename.View"
+        xmlns:local="clr-namespace:BatchRename"
         mc:Ignorable="d"
         Title="Replace Rule" Height="350" Width="400" ResizeMode="NoResize"
         Loaded="Window_Loaded"
@@ -38,7 +38,9 @@
                     materialDesign:HintAssist.Hint="Replace word"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                     materialDesign:TransitionAssist.DisableTransitions="True" 
-                    Margin="0 5 5 5"></TextBox>
+                    Margin="0 5 5 5">
+                    
+                </TextBox>
                 <Button
                     Grid.Column="1"
                     Margin="5 0 0 0"
@@ -49,13 +51,22 @@
                 </Button>
             </Grid>
             <TextBox
+                x:Name="ReplacerTxt"
                 FontSize="14"
                 Padding="5 2"
                 materialDesign:HintAssist.Hint="With"
                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                 materialDesign:TransitionAssist.DisableTransitions="True" 
-                Margin="15 10"
-                Text="{Binding Replacer}"/>
+                Margin="15 10">
+                <TextBox.Text>
+                    <Binding Path="Replacer" ValidatesOnDataErrors="True"
+                    UpdateSourceTrigger="PropertyChanged" >
+                        <Binding.ValidationRules>
+                            <local:NoSpecialCharRule></local:NoSpecialCharRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
         </StackPanel>
         <GroupBox Header="Replace Word" Margin="10 10" Grid.Column="1" >
             <StackPanel>
@@ -85,9 +96,21 @@
             <Button
                 Click="Confirm_Button_Click"
                 Margin="5"
-                Style="{StaticResource MaterialDesignRaisedLightButton}"
-                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" 
-                Content="Confirm"/>
+                Content="Confirm">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedLightButton}">
+                        <Setter Property="IsEnabled" Value="False"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=ReplacerTxt}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="IsEnabled" Value="True"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
             <Button
                 Click="Cancel_Button_Click"
                 Margin="5"

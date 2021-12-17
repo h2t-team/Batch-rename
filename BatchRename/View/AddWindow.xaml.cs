@@ -1,11 +1,12 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 
 namespace BatchRename.View
 {
     /// <summary>
     /// Interaction logic for AddRules.xaml
     /// </summary>
-    public partial class AddWindow : Window
+    public partial class AddWindow : Window, INotifyPropertyChanged
     {
         public string RuleName { get; set; }
         public string Word { set; get; }
@@ -13,6 +14,8 @@ namespace BatchRename.View
         {
             InitializeComponent();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void Confirm_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -24,6 +27,11 @@ namespace BatchRename.View
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = this;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using BatchRename.DataTypes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace BatchRename.View
     /// <summary>
     /// Interaction logic for UpdateCounterWindow.xaml
     /// </summary>
-    public partial class UpdateCounterWindow : Window
+    public partial class UpdateCounterWindow : Window, INotifyPropertyChanged
     {
         public int Start { get; set; }
         public int Step { get; set; }
@@ -30,6 +31,8 @@ namespace BatchRename.View
             Step = ((AddCounterRuleUI)rule).Step;
             Digit = ((AddCounterRuleUI)rule).Digit;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {

@@ -19,10 +19,13 @@ namespace BatchRename.View
     /// <summary>
     /// Interaction logic for UpdateReplaceWindow.xaml
     /// </summary>
-    public partial class UpdateReplaceWindow : Window
+    public partial class UpdateReplaceWindow : Window, INotifyPropertyChanged
     {
         private BindingList<string> wordBinding = new BindingList<string>();
         public List<string> Needles;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string Replacer { set; get; }
         public UpdateReplaceWindow(RuleUI rule)
         {

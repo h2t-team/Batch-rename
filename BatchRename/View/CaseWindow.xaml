@@ -42,9 +42,18 @@
             <Button
                 Click="Confirm_Button_Click"
                 Margin="5"
-                Style="{StaticResource MaterialDesignRaisedLightButton}"
-                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" 
-                Content="Confirm"/>
+                Content="Confirm">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedLightButton}">
+                        <Setter Property="IsEnabled" Value="True"/>
+                        <Style.Triggers>
+                            <DataTrigger  Binding="{Binding Path=SelectedItem, ElementName=RuleBox}" Value="{x:Null}">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
             <Button
                 Click="Cancel_Button_Click"
                 Margin="5"

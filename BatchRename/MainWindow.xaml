@@ -29,6 +29,7 @@
         <ToolBarTray Grid.ColumnSpan="2" Margin="0 0 0 5" VerticalAlignment="Center">
             <ToolBar Style="{DynamicResource MaterialDesignToolBar}" ClipToBounds="False">
                 <Button Style="{StaticResource MaterialDesignFlatDarkButton}"
+                        Click="Open_Preset_Button_Click"
                     ToolTip="Open a preset">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="FileDocumentMultiple" VerticalAlignment="Center"/>
@@ -58,12 +59,11 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
                     <ComboBox Name="presetComboBox" VerticalContentAlignment="Center" materialDesign:HintAssist.Hint="Action" Grid.Column="0" Padding="5" Margin="10 5" materialDesign:HintAssist.HelperText="Select one action">
-                        <ComboBoxItem Content="Replace"/>
-                        <ComboBoxItem Content="Add" />
-                        <ComboBoxItem Content="Add Counter" />
-                        <ComboBoxItem Content="New Case" />
-                        <ComboBoxItem Content="Change Extension" />
-                        <ComboBoxItem Content="Trim" />
+                        <ComboBox.ItemTemplate >
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" ></TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
                     </ComboBox>
                     <Button Grid.Column="1"
                       Margin="5"
@@ -94,7 +94,8 @@
                             </ListView.Resources>
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListViewItem}" >
-                                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}"/>
+                                    <Setter Property="ContextMenu" 
+                                            Value="{StaticResource ItemContextMenu}"/>
                                 </Style>
                             </ListView.ItemContainerStyle>
                         </ListView>
@@ -173,11 +174,18 @@
                           SizeChanged="ListView_SizeChanged"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ScrollViewer.CanContentScroll="False">
+                    <ListView.Resources>
+                        <ContextMenu x:Key="ItemContextMenu">
+                            <MenuItem Header="Delete" Click="Delete_File_Click"/>
+                        </ContextMenu>
+                    </ListView.Resources>
                     <ListView.Style>
                         <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource MaterialDesignListView}">
                             <Setter Property="OverridesDefaultStyle" Value="True" />
                             <Setter Property="BorderThickness" Value="10,10,10,10" />
                             <Setter Property="Padding" Value="5" />
+                            <Setter Property="ContextMenu" 
+                                    Value="{StaticResource ItemContextMenu}"/>
                         </Style>
                     </ListView.Style>
                     <ListView.View>
@@ -196,6 +204,7 @@
                                 DisplayMemberBinding="{Binding Status}"/>
                         </GridView>
                     </ListView.View>
+                    
                 </ListView>
             </StackPanel>
         </materialDesign:Card>

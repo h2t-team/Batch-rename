@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace BatchRename.View
     /// <summary>
     /// Interaction logic for CounterWindow.xaml
     /// </summary>
-    public partial class CounterWindow : Window
+    public partial class CounterWindow : Window, INotifyPropertyChanged
     {
         public int Start { get; set; }
         public int Step { get; set; }
@@ -26,6 +27,8 @@ namespace BatchRename.View
         {
             InitializeComponent();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void Confirm_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -38,6 +41,11 @@ namespace BatchRename.View
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = this;
         }
     }
 }
