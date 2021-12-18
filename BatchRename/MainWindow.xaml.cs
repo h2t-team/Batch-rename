@@ -127,7 +127,7 @@ namespace BatchRename
                 // load the size of the screen
                 type = filelines[0].Substring(0, filelines[0].IndexOf(':'));
                 if (type == "Size")
-                {
+                {   
                     line = filelines[0].Substring(filelines[0].IndexOf(':') + 2);
                     tokens = line.Split(new string[] { " " }, StringSplitOptions.None);
                     Main.Width = double.Parse(tokens[0]);
@@ -152,6 +152,12 @@ namespace BatchRename
             if (File.Exists(autoSaveFile))
             {
                 string[] filelines = File.ReadAllLines(autoSaveFile);
+
+                //load the file list
+
+                // load the folder list
+
+                // load the rules
                 string[] tokens;
             }
         }
@@ -649,6 +655,11 @@ namespace BatchRename
                 timer.Stop();
                 AutoSaveFile();
             };
+        }
+
+        private void AutoSave_Condition(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            Debug.WriteLine("test");
         }
     }
 }

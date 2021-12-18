@@ -174,7 +174,8 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           SizeChanged="ListView_SizeChanged"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          ScrollViewer.CanContentScroll="False">
+                          ScrollViewer.CanContentScroll="False"
+                          DataContextChanged="AutoSave_Condition">
                     <ListView.Resources>
                         <ContextMenu x:Key="ItemContextMenu">
                             <MenuItem Header="Delete" Click="Delete_File_Click"/>
