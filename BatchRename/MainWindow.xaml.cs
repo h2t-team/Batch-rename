@@ -252,6 +252,27 @@ namespace BatchRename
                 arr = folders;
             if (rules.Count == 0 || arr.Count == 0)
                 return;
+            bool isCopy = false;
+            string copyPath = "";
+            if (file.IsChecked == true)
+            {
+                do
+                {
+                    var dialog = new ConfirmWindow("Do you want to create a copy of file instead of overwrite it ?");
+                    if (dialog.ShowDialog() == true)
+                    {
+                        VistaFolderBrowserDialog folderDialog = new VistaFolderBrowserDialog();
+                        if (folderDialog.ShowDialog() == true)
+                        {
+                            copyPath = folderDialog.SelectedPath;
+                            isCopy = true;
+                            break;
+                        }
+                    }
+                    else
+                        break;
+                } while (true);
+            }
             foreach (var rule in rules)
                 newNames = rule.Rename(newNames);
             for (int i = 0; i < arr.Count; i++)
@@ -259,7 +280,12 @@ namespace BatchRename
                 try
                 {
                     if (file.IsChecked == true)
-                        File.Move($"{arr[i].Path}\\{arr[i].Name}", $"{arr[i].Path}\\{newNames[i]}");
+                    {
+                        if (isCopy)
+                            File.Copy($"{arr[i].Path}\\{arr[i].Name}", $"{copyPath}\\{newNames[i]}");
+                        else
+                            File.Move($"{arr[i].Path}\\{arr[i].Name}", $"{arr[i].Path}\\{newNames[i]}");
+                    }
                     else if (folder.IsChecked == true)
                         Directory.Move($"{arr[i].Path}\\{arr[i].Name}", $"{arr[i].Path}\\{newNames[i]}");
                     arr[i].Status = "Success";
@@ -396,7 +422,7 @@ namespace BatchRename
 
         private void Add_Preset_Click(object sender, RoutedEventArgs e)
         {
-            string option =presetComboBox.Text;
+            string option = presetComboBox.Text;
             switch (option)
             {
                 case "Add":
@@ -529,11 +555,12 @@ namespace BatchRename
             if (file.IsChecked == true)
             {
                 files.RemoveAt(index);
-            } else if (folder.IsChecked == true)
+            }
+            else if (folder.IsChecked == true)
             {
                 folders.RemoveAt(index);
             }
-        }     
+        }
         private void Window_Closed(object sender, EventArgs e)
         {
             // get current size
