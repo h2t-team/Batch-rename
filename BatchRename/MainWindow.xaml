@@ -18,7 +18,7 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
         WindowStartupLocation="Manual">
-    <Grid MouseMove="AutoSave_Condition">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="5*" />
@@ -174,8 +174,7 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           SizeChanged="ListView_SizeChanged"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          ScrollViewer.CanContentScroll="False"
-                          DataContextChanged="AutoSave_Condition">
+                          ScrollViewer.CanContentScroll="False">
                     <ListView.Resources>
                         <ContextMenu x:Key="ItemContextMenu">
                             <MenuItem Header="Delete" Click="Delete_File_Click"/>

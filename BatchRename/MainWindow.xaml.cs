@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Windows.Data;
 using System.Globalization;
 using System.Windows.Threading;
+using System.Collections.Specialized;
 
 namespace BatchRename
 {
@@ -44,6 +45,22 @@ namespace BatchRename
         public MainWindow()
         {
             InitializeComponent();
+
+            // add listview event 
+            ((INotifyCollectionChanged)fileList.Items).CollectionChanged += AutoSave_Conditions;
+            ((INotifyCollectionChanged)presetList.Items).CollectionChanged += AutoSave_Conditions;
+        }
+
+        private void AutoSave_Conditions(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            // event triggered after 1 second
+            DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(1) };
+            timer.Start();
+            timer.Tick += (sender, args) =>
+            {
+                timer.Stop();
+                AutoSaveFile();
+            };
         }
 
         private void LoadRuleFromUI()
@@ -121,44 +138,14 @@ namespace BatchRename
             if (File.Exists(stateFile))
             {
                 string[] filelines = File.ReadAllLines(stateFile);
-                string[] tokens;
-                string line, type;
-
-                // load the size of the screen
-                type = filelines[0].Substring(0, filelines[0].IndexOf(':'));
-                if (type == "Size")
-                {   
-                    line = filelines[0].Substring(filelines[0].IndexOf(':') + 2);
-                    tokens = line.Split(new string[] { " " }, StringSplitOptions.None);
-                    Main.Width = double.Parse(tokens[0]);
-                    Main.Height = double.Parse(tokens[1]);
-                }
-
-                // load the location of the screen
-                type = filelines[1].Substring(0, filelines[1].IndexOf(':'));
-                if (type == "Location")
-                {
-                    line = filelines[1].Substring(filelines[1].IndexOf(':') + 2);
-                    tokens = line.Split(new string[] { " " }, StringSplitOptions.None);
-                    Main.Top = double.Parse(tokens[0]);
-                    Main.Left = double.Parse(tokens[1]);
-                }
-
-                filelines = filelines.Skip(2).ToArray();
-                loadPreset(filelines);
+                loadState(filelines);
             }
 
             // load the working condition
             if (File.Exists(autoSaveFile))
             {
                 string[] filelines = File.ReadAllLines(autoSaveFile);
-
-                //load the file list
-
-                // load the folder list
-
-                // load the rules
-                string[] tokens;
+                loadWorkingCondition(filelines);
             }
         }
         private void File_Active(object sender, RoutedEventArgs e)
@@ -171,6 +158,77 @@ namespace BatchRename
             if (fileList != null)
                 fileList.ItemsSource = folders;
         }
+        private void loadState(string[] filelines)
+        {
+            string[] tokens;
+            string line, type;
+
+            // load the size of the screen
+            type = filelines[0].Substring(0, filelines[0].IndexOf(':'));
+            if (type == "Size")
+            {
+                line = filelines[0].Substring(filelines[0].IndexOf(':') + 2);
+                tokens = line.Split(new string[] { " " }, StringSplitOptions.None);
+                Main.Width = double.Parse(tokens[0]);
+                Main.Height = double.Parse(tokens[1]);
+            }
+
+            // load the location of the screen
+            type = filelines[1].Substring(0, filelines[1].IndexOf(':'));
+            if (type == "Location")
+            {
+                line = filelines[1].Substring(filelines[1].IndexOf(':') + 2);
+                tokens = line.Split(new string[] { " " }, StringSplitOptions.None);
+                Main.Top = double.Parse(tokens[0]);
+                Main.Left = double.Parse(tokens[1]);
+            }
+
+            filelines = filelines.Skip(2).ToArray();
+            loadPreset(filelines);
+        }
+        private void loadWorkingCondition(string[] filelines)
+        {
+            int preIndex = 0;
+            int index;
+
+            //load the file list
+            index = Array.IndexOf(filelines, "~", preIndex);
+            string[] fileArr = filelines.ToList().GetRange(preIndex, index - preIndex).ToArray();
+            foreach (var line in fileArr)
+            {
+                string[] tokens = line.Split(new string[] { "|" }, StringSplitOptions.None); ;
+                files.Add(new FileUI()
+                {
+                    Name = tokens[0],
+                    Path = tokens[1],
+                    Preview = "",
+                    Status = ""
+                });
+            }
+
+            // load the folder list
+            preIndex = index + 1;
+            index = Array.IndexOf(filelines, "~", preIndex);
+            string[] folderArr = filelines.ToList().GetRange(preIndex, index - preIndex).ToArray();
+            foreach (var line in folderArr)
+            {
+                Debug.WriteLine(line);
+                string[] tokens = line.Split(new string[] { "|" }, StringSplitOptions.None);
+                folders.Add(new FileUI()
+                {
+                    Name = tokens[0],
+                    Path = tokens[1],
+                    Preview = "",
+                    Status = ""
+                });
+            }
+
+            // load the rules
+            preIndex = index + 1;
+            index = Array.IndexOf(filelines, "~", preIndex);
+            string[] presetArr = filelines.ToList().GetRange(preIndex, index - preIndex).ToArray();
+            loadPreset(presetArr);
+        }
         private void addFileListView(string[] fileArr)
         {
             var arr = files;
@@ -181,7 +239,6 @@ namespace BatchRename
             bool check;
             foreach (string item in fileArr)
             {
-                Debug.WriteLine(File.Exists(item));
                 check = true;
                 if ((file.IsChecked == true && File.Exists(item) == false) || (folder.IsChecked == true && Directory.Exists(item) == false))
                     check = false;
@@ -650,43 +707,27 @@ namespace BatchRename
             string textout = "";
 
             //auto the save the current file list
-            textout += "~Files:" + Environment.NewLine;
             foreach (FileUI file in files)
             {
                 textout += file.Name + "|" + file.Path;
                 textout += Environment.NewLine;
             }
+            textout += "~" + Environment.NewLine;
 
-            textout += "~Folders:" + Environment.NewLine;
             foreach (FileUI folder in folders)
             {
                 textout += folder.Name + "|" + folder.Path;
                 textout += Environment.NewLine;
             }
+            textout += "~" + Environment.NewLine;
 
             // auto save the current set of renaming rules, together with the parameters
-            textout += "~Rules: " + Environment.NewLine;
             foreach (RuleUI rule in presets)
             {
                 textout = textout + rule.Display + Environment.NewLine;
             }
+            textout += "~" + Environment.NewLine;
             File.WriteAllText(autoSaveFile, textout);
-        }
-
-        private void AutoSave_Condition(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(1) };
-            timer.Start();
-            timer.Tick += (sender, args) =>
-            {
-                timer.Stop();
-                AutoSaveFile();
-            };
-        }
-
-        private void AutoSave_Condition(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            Debug.WriteLine("test");
         }
     }
 }
