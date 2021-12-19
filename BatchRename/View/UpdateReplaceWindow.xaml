@@ -39,7 +39,6 @@
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                     materialDesign:TransitionAssist.DisableTransitions="True" 
                     Margin="0 5 5 5">
-                    
                 </TextBox>
                 <Button
                     Grid.Column="1"
@@ -107,6 +106,9 @@
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="IsEnabled" Value="True"/>
                             </MultiDataTrigger>
+                            <DataTrigger Binding="{Binding Path=Items.Count, ElementName=wordList}" Value="0">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Button.Style>
