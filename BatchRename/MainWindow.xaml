@@ -17,7 +17,9 @@
         Name="Main"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
-        WindowStartupLocation="Manual">
+        WindowStartupLocation="Manual"
+        MinHeight="600"
+        MinWidth="900">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" />
@@ -25,16 +27,16 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*" />
-            <RowDefinition Height="5*" />
+            <RowDefinition Height="9*" />
         </Grid.RowDefinitions>
-        <ToolBarTray Grid.ColumnSpan="2" Margin="0 0 0 5" VerticalAlignment="Center">
+        <ToolBarTray Grid.ColumnSpan="2" Margin="0 0 0 5">
             <ToolBar Style="{DynamicResource MaterialDesignToolBar}" ClipToBounds="False">
                 <Button Style="{StaticResource MaterialDesignFlatDarkButton}"
                         Click="Open_Preset_Button_Click"
                     ToolTip="Open a preset">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="FileDocumentMultiple" VerticalAlignment="Center"/>
-                        <Label>Open</Label>
+                        <Label>Open Preset</Label>
                     </StackPanel>
                 </Button>
                 <Button Style="{StaticResource MaterialDesignFlatDarkButton}"
@@ -42,13 +44,13 @@
                         ToolTip="Save the current preset">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="ContentSave" VerticalAlignment="Center"/>
-                        <Label>Save</Label>
+                        <Label>Save Preset</Label>
                     </StackPanel>
                 </Button>
                 <Button
-                  ToolTip="Take a nap"
+                  ToolTip="More"
                   ToolBar.OverflowMode="Always"
-                  Content="{materialDesign:PackIcon Kind=Hotel}" />
+                  Content="{materialDesign:PackIcon Kind=Play}" />
                 <Separator />
             </ToolBar>
         </ToolBarTray>

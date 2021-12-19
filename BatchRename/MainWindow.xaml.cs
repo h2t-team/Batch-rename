@@ -51,18 +51,6 @@ namespace BatchRename
             ((INotifyCollectionChanged)presetList.Items).CollectionChanged += AutoSave_Conditions;
         }
 
-        private void AutoSave_Conditions(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            // event triggered after 1 second
-            DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(1) };
-            timer.Start();
-            timer.Tick += (sender, args) =>
-            {
-                timer.Stop();
-                AutoSaveFile();
-            };
-        }
-
         private void LoadRuleFromUI()
         {
             rules.Clear();
@@ -212,7 +200,6 @@ namespace BatchRename
             string[] folderArr = filelines.ToList().GetRange(preIndex, index - preIndex).ToArray();
             foreach (var line in folderArr)
             {
-                Debug.WriteLine(line);
                 string[] tokens = line.Split(new string[] { "|" }, StringSplitOptions.None);
                 folders.Add(new FileUI()
                 {
@@ -262,6 +249,43 @@ namespace BatchRename
                     Preview = "",
                     Status = ""
                 });
+            }
+        }
+        private void Open_Preset_Button_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                ShowAllActions();
+                presets.Clear();
+                string filename = dialog.FileName;
+                string[] filelines = File.ReadAllLines(filename);
+                loadPreset(filelines);
+            }
+        }
+        //When open another preset => all actions are shown again 
+        private void ShowAllActions()
+        {
+            actionsUI = new BindingList<string>(actions.ToList());
+            presetComboBox.ItemsSource = actionsUI;
+        }
+        private void Save_Preset_Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Displays a SaveFileDialog so the user can save the current preset.
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Text Documents|*.txt";
+            saveFileDialog.Title = "Save the current preset";
+            saveFileDialog.ShowDialog();
+            // If the file name is not an empty string open it for saving.
+            if (saveFileDialog.FileName != "")
+            {
+                //write all rules in textout
+                string textout = "";
+                foreach (var rule in presets)
+                {
+                    textout = textout + rule.Display + Environment.NewLine;
+                }
+                File.WriteAllText(saveFileDialog.FileName, textout);
             }
         }
         private void Add_Button_Click(object sender, RoutedEventArgs e)
@@ -457,25 +481,6 @@ namespace BatchRename
             }
             selected.Update();
         }
-        private void Save_Preset_Button_Click(object sender, RoutedEventArgs e)
-        {
-            // Displays a SaveFileDialog so the user can save the current preset.
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Text Documents|*.txt";
-            saveFileDialog.Title = "Save the current preset";
-            saveFileDialog.ShowDialog();
-            // If the file name is not an empty string open it for saving.
-            if (saveFileDialog.FileName != "")
-            {
-                //write all rules in textout
-                string textout = "";
-                foreach (var rule in presets)
-                {
-                    textout = textout + rule.Display + Environment.NewLine;
-                }
-                File.WriteAllText(saveFileDialog.FileName, textout);
-            }
-        }
 
         private void Add_Preset_Click(object sender, RoutedEventArgs e)
         {
@@ -553,7 +558,7 @@ namespace BatchRename
             }
         }
 
-
+        // Responsive listview
         private void ListView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             ListView listView = sender as ListView;
@@ -570,7 +575,8 @@ namespace BatchRename
             gView.Columns[2].Width = workingWidth * col3;
             gView.Columns[3].Width = workingWidth * col4;
         }
-        //Drag and drop files to the list
+
+        // Drag and drop files to the list
         private void HandleFileDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -580,28 +586,17 @@ namespace BatchRename
             }
         }
 
+        // dynamic height listview
         private void handleCardSize(object sender, SizeChangedEventArgs e)
         {
-            fileList.Height = fileCard.ActualHeight - fileOptions.ActualHeight;
-        }
-
-        private void Open_Preset_Button_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog dialog = new OpenFileDialog();
-            if (dialog.ShowDialog() == true)
+            if (fileCard.ActualHeight - fileOptions.ActualHeight > 0)
             {
-                ShowAllActions();
-                presets.Clear();
-                string filename = dialog.FileName;
-                string[] filelines = File.ReadAllLines(filename);
-                loadPreset(filelines);
+                fileList.Height = fileCard.ActualHeight - fileOptions.ActualHeight;
             }
-        }
-        //When open another preset => all actions are shown again 
-        private void ShowAllActions()
-        {
-            actionsUI = new BindingList<string>(actions.ToList());
-            presetComboBox.ItemsSource = actionsUI;
+            else
+            {
+                fileList.Height = 0;
+            }
         }
 
         private void Delete_File_Click(object sender, RoutedEventArgs e)
@@ -618,22 +613,7 @@ namespace BatchRename
                 folders.RemoveAt(index);
             }
         }
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            // get current size
-            double width = Main.Width;
-            double height = Main.Height;
-
-            // get current location
-            double top = Main.Top;
-            double left = Main.Left;
-
-            //write the sizes and locations into the file
-            string textout = "";
-            textout += $"Size: {width} {height}" + Environment.NewLine;
-            textout += $"Location: {top} {left}" + Environment.NewLine;
-            File.WriteAllText(stateFile, textout);
-        }
+       
         void loadPreset(string[] filelines)
         {
             for (int i = 0; i < filelines.Length; i++)
@@ -702,6 +682,17 @@ namespace BatchRename
                 }
             }
         }
+        private void AutoSave_Conditions(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            // event triggered after 1 second
+            DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(1) };
+            timer.Start();
+            timer.Tick += (sender, args) =>
+            {
+                timer.Stop();
+                AutoSaveFile();
+            };
+        }
         private void AutoSaveFile()
         {
             string textout = "";
@@ -714,6 +705,7 @@ namespace BatchRename
             }
             textout += "~" + Environment.NewLine;
 
+            //auto the save the current folder list
             foreach (FileUI folder in folders)
             {
                 textout += folder.Name + "|" + folder.Path;
@@ -728,6 +720,22 @@ namespace BatchRename
             }
             textout += "~" + Environment.NewLine;
             File.WriteAllText(autoSaveFile, textout);
+        }
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            // get current size
+            double width = Main.Width;
+            double height = Main.Height;
+
+            // get current location
+            double top = Main.Top;
+            double left = Main.Left;
+
+            //write the sizes and locations into the file
+            string textout = "";
+            textout += $"Size: {width} {height}" + Environment.NewLine;
+            textout += $"Location: {top} {left}" + Environment.NewLine;
+            File.WriteAllText(stateFile, textout);
         }
     }
 }
