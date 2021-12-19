@@ -388,17 +388,21 @@ namespace BatchRename
             switch (selected.TYPE)
             {
                 case "AddCounter":
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Add Counter" });
                     actionsUI.Add("Add Counter");
                     break;
                 case "Trim":
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Trim" });
                     actionsUI.Add("Trim");
                     break;
                 case "AllLower":
                 case "AllUpper":
                 case "PascalCase":
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "New Case" });
                     actionsUI.Add("New Case");
                     break;
                 case "ChangeExtension":
+                    //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Change Extension" });
                     actionsUI.Add("Change Extension");
                     break;
             }
@@ -502,6 +506,7 @@ namespace BatchRename
                     CounterWindow counterDialog = new CounterWindow();
                     if (counterDialog.ShowDialog() == true)
                     {
+                        //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
                         actionsUI.Remove("Add Counter");
                         presets.Add(new AddCounterRuleUI(
                             counterDialog.Start,
@@ -513,6 +518,7 @@ namespace BatchRename
                     CaseWindow caseDialog = new CaseWindow();
                     if (caseDialog.ShowDialog() == true)
                     {
+                        //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
                         actionsUI.Remove("New Case");
                         switch (caseDialog.RuleName)
                         {
@@ -529,6 +535,7 @@ namespace BatchRename
                     }
                     break;
                 case "Trim":
+                    //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
                     actionsUI.Remove("Trim");
                     presets.Add(new TrimRuleUI());
                     break;
@@ -536,6 +543,7 @@ namespace BatchRename
                     ExtensionWindow extDialog = new ExtensionWindow();
                     if (extDialog.ShowDialog() == true)
                     {
+                        //presetComboBox.Items.Remove(presetComboBox.SelectedItem);
                         actionsUI.Remove("Change Extension");
                         presets.Add(new ChangeExtRuleUI(extDialog.Ext));
                     }
@@ -641,16 +649,9 @@ namespace BatchRename
                             string replacement = parts[1].Substring(1, parts[1].Length - 2);
                             presets.Add(new ReplaceRuleUI(needles, replacement));
                             break;
-                        case "All Upper Case":
-                            presets.Add(new AllUpperRuleUI());
-                            actionsUI.Remove("New Case");
-                            break;
-                        case "All Lower Case":
-                            presets.Add(new AllLowerRuleUI());
-                            actionsUI.Remove("New Case");
-                            break;
+                        case "All Upper":
+                        case "All Lower":
                         case "Pascal Case":
-                            presets.Add(new PascalCaseRuleUI());
                             actionsUI.Remove("New Case");
                             break;
                         case "Trim":
