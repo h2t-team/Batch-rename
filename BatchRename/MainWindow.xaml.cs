@@ -476,6 +476,7 @@ namespace BatchRename
                     if (replaceDialog.ShowDialog() == true)
                     {
                         ((ReplaceRuleUI)selected).Needles = new List<string>(replaceDialog.Needles);
+                        ((ReplaceRuleUI)selected).Replacer = replaceDialog.Replacer;
                     }
                     break;
             }
