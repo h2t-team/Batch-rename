@@ -39,6 +39,7 @@
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                     materialDesign:TransitionAssist.DisableTransitions="True" 
                     Margin="0 5 5 5">
+                    
                 </TextBox>
                 <Button
                     Grid.Column="1"
@@ -56,22 +57,12 @@
                 materialDesign:HintAssist.Hint="With"
                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                 materialDesign:TransitionAssist.DisableTransitions="True" 
-                Margin="15 10">
-                <TextBox.Text>
-                    <Binding Path="Replacer" ValidatesOnDataErrors="True"
-                    UpdateSourceTrigger="PropertyChanged" >
-                        <Binding.ValidationRules>
-                            <local:NoSpecialCharRule></local:NoSpecialCharRule>
-                        </Binding.ValidationRules>
-                    </Binding>
-                </TextBox.Text>
-            </TextBox>
+                Margin="15 10"></TextBox>
         </StackPanel>
         <GroupBox Header="Replace Word" Margin="10 10" Grid.Column="1" >
             <StackPanel>
                 <ListView x:Name="wordList" 
-                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          ItemsSource="{Binding wordBinding, UpdateSourceTrigger=PropertyChanged}">
+                           ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <TextBlock TextWrapping="Wrap"
@@ -96,27 +87,9 @@
             <Button
                 Click="Confirm_Button_Click"
                 Margin="5"
-                Content="Confirm">
-                <Button.Style>
-                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedLightButton}">
-                        <Setter Property="IsEnabled" Value="False"/>
-                        <Style.Triggers>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=ReplacerTxt}" Value="False"/>
-                                </MultiDataTrigger.Conditions>
-                                <Setter Property="IsEnabled" Value="True"/>
-                            </MultiDataTrigger>
-                            <DataTrigger  Binding="{Binding Text, ElementName=ReplacerTxt}" Value="">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Path=Items.Count, ElementName=wordList}" Value="0">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
+                Style="{StaticResource MaterialDesignRaisedLightButton}"
+                IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" 
+                Content="Confirm"></Button>
             <Button
                 Click="Cancel_Button_Click"
                 Margin="5"
