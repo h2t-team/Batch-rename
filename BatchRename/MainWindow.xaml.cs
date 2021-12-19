@@ -591,75 +591,11 @@ namespace BatchRename
         {
             if (fileCard.ActualHeight - fileOptions.ActualHeight > 0)
             {
-                ShowAllActions();
-                presets.Clear();
-                string filename = dialog.FileName;
-                string[] filelines = File.ReadAllLines(filename);
-                for (int i = 0; i < filelines.Length; i++)
-                {
-                    string line = filelines[i];
-                    int firstColonIndex = line.IndexOf(":");
-                    string type = "";
-                    if (firstColonIndex > 0)
-                    {
-                        type = line.Substring(0, firstColonIndex);
-                    }
-                    else
-                    {
-                        type = line;
-                    }
-                    string[] tokens;
-                    string[] parts;
-                    switch (type)
-                    {
-                        case "Add Counter":
-                            tokens = line.Split(new string[] { "Add Counter: " }, StringSplitOptions.None);
-                            parts = tokens[1].Split(new string[] { " " }, StringSplitOptions.None);
-                            int start = int.Parse(parts[0].Substring(1, parts[0].Length - 1));
-                            int step = int.Parse(parts[1].Substring(1, parts[1].Length - 1));
-                            int digit = int.Parse(parts[2].Substring(1, parts[2].Length - 1));
-                            presets.Add(new AddCounterRuleUI(start, step, digit));
-                            actionsUI.Remove("Add Counter");
-                            break;
-                        case "Add Prefix":
-                            tokens = line.Split(new string[] { "Add Prefix: " }, StringSplitOptions.None);
-                            string prefix = tokens[1];
-                            presets.Add(new AddPrefixRuleUI(prefix));
-                            break;
-                        case "Add Suffix":
-                            tokens = line.Split(new string[] { "Add Suffix: " }, StringSplitOptions.None);
-                            string suffix = tokens[1];
-                            presets.Add(new AddSuffixRuleUI(suffix));
-                            break;
-                        case "Change Extension":
-                            tokens = line.Split(new string[] { "Change Extension: " }, StringSplitOptions.None);
-                            string ext = tokens[1];
-                            presets.Add(new ChangeExtRuleUI(ext));
-                            actionsUI.Remove("Change Extension");
-                            break;
-                        case "Replace":
-                            tokens = line.Split(new string[] { "Replace: " }, StringSplitOptions.None);
-                            parts = tokens[1].Split(new string[] { " => " }, StringSplitOptions.None);
-                            string[] words = parts[0].Substring(1, parts[0].Length - 2).Split(new string[] { ", " }, StringSplitOptions.None);
-                            List<string> needles = new List<string>();
-                            foreach (string word in words)
-                            {
-                                needles.Add(word.Substring(1, word.Length - 2));
-                            }
-                            string replacement = parts[1].Substring(1, parts[1].Length - 2);
-                            presets.Add(new ReplaceRuleUI(needles, replacement));
-                            break;
-                        case "All Upper":
-                        case "All Lower":
-                        case "Pascal Case":
-                            actionsUI.Remove("New Case");
-                            break;
-                        case "Trim":
-                            presets.Add(new TrimRuleUI());
-                            actionsUI.Remove("Trim");
-                            break;
-                    }
-                }
+                fileList.Height = fileCard.ActualHeight - fileOptions.ActualHeight;
+            }
+            else
+            {
+                fileList.Height = 0;
             }
         }
 
