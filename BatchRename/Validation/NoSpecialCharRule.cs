@@ -13,9 +13,9 @@ namespace BatchRename
     { 
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            string fileName = (string)value;
+            string fileName = (string) value;
             ValidationResult result = ValidationResult.ValidResult;
-            if (fileName.Length>0)
+            if (fileName.Length > 0)
             {
                 string pattern = "^[^\\\\/:*?\"<>|]+$";
                 var regex = new Regex(pattern);

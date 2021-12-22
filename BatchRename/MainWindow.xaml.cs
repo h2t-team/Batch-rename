@@ -22,7 +22,7 @@ namespace BatchRename
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         List<string> newNames = new();
         BindingList<FileUI> files = new BindingList<FileUI>(); // file rename list
@@ -42,6 +42,21 @@ namespace BatchRename
         BindingList<string> actionsUI = new BindingList<string>();
         string stateFile = "LastTimeState.bin";  //last time state filename
         string autoSaveFile = "AutoSaveFile.bin"; // autosave filename
+        private string currentPreset;
+        public string CurrentPreset { 
+            get 
+            {
+                return currentPreset;
+            } 
+            set 
+            {
+                currentPreset = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentPreset"));
+            } 
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -49,6 +64,7 @@ namespace BatchRename
             // add listview event 
             ((INotifyCollectionChanged)fileList.Items).CollectionChanged += AutoSave_Conditions;
             ((INotifyCollectionChanged)presetList.Items).CollectionChanged += AutoSave_Conditions;
+            DataContext = this;
         }
 
         private void LoadRuleFromUI()
@@ -171,8 +187,13 @@ namespace BatchRename
                 Main.Left = double.Parse(tokens[1]);
             }
 
-            filelines = filelines.Skip(2).ToArray();
-            loadPreset(filelines);
+            // load the last chosen preset
+            type = filelines[2].Substring(0, filelines[2].IndexOf(':'));
+            if (type == "Preset")
+            {
+                line = filelines[2].Substring(filelines[2].IndexOf(':') + 2);
+                CurrentPreset = line;
+            }
         }
         private void loadWorkingCondition(string[] filelines)
         {
@@ -261,6 +282,9 @@ namespace BatchRename
                 string filename = dialog.FileName;
                 string[] filelines = File.ReadAllLines(filename);
                 loadPreset(filelines);
+                Debug.WriteLine(dialog.FileName);
+                FileInfo fi = new FileInfo(dialog.FileName);
+                CurrentPreset = fi.Name;
             }
         }
         //When open another preset => all actions are shown again 
@@ -286,7 +310,24 @@ namespace BatchRename
                     textout = textout + rule.Display + Environment.NewLine;
                 }
                 File.WriteAllText(saveFileDialog.FileName, textout);
+
+                FileInfo fi = new FileInfo(saveFileDialog.FileName);
+                CurrentPreset = fi.Name;
             }
+
+        }
+        private void Clear_Preset_Button_Click(object sender, RoutedEventArgs e)
+        {
+            presets.Clear();
+        }
+        private void Clear_Files_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var arr = files;
+            if (file.IsChecked == true)
+                arr = files;
+            else if (folder.IsChecked == true)
+                arr = folders;
+            arr.Clear();
         }
         private void Add_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -736,6 +777,7 @@ namespace BatchRename
             string textout = "";
             textout += $"Size: {width} {height}" + Environment.NewLine;
             textout += $"Location: {top} {left}" + Environment.NewLine;
+            textout += $"Preset: {CurrentPreset}" + Environment.NewLine;
             File.WriteAllText(stateFile, textout);
         }
     }

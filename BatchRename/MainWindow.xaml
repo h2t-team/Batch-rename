@@ -47,11 +47,30 @@
                         <Label>Save Preset</Label>
                     </StackPanel>
                 </Button>
+                <Button Style="{StaticResource MaterialDesignFlatDarkButton}"
+                        Click="Clear_Preset_Button_Click"
+                        ToolTip="Clear the set of rules">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="CloseThick" VerticalAlignment="Center"/>
+                        <Label>Clear Preset</Label>
+                    </StackPanel>
+                </Button>
                 <Button
                   ToolTip="More"
                   ToolBar.OverflowMode="Always"
                   Content="{materialDesign:PackIcon Kind=Play}" />
                 <Separator />
+                <Button Style="{StaticResource MaterialDesignFlatDarkButton}"
+                        Click="Clear_Files_Button_Click"
+                        ToolTip="Clear the file/folder list">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="AutoRenew" VerticalAlignment="Center"/>
+                        <Label>Clear Files</Label>
+                    </StackPanel>
+                </Button>
+                <Separator />
+                <TextBlock Margin="5" VerticalAlignment="Center" FontWeight="Bold" FontSize="16">Preset:</TextBlock>
+                <TextBlock VerticalAlignment="Center" FontWeight="Bold" FontSize="16" Text="{Binding CurrentPreset}"/>
             </ToolBar>
         </ToolBarTray>
         <materialDesign:Card Grid.Column="0" Grid.Row="1" Margin="10 5 5 10">
@@ -207,7 +226,6 @@
                                 DisplayMemberBinding="{Binding Status}"/>
                         </GridView>
                     </ListView.View>
-                    
                 </ListView>
             </StackPanel>
         </materialDesign:Card>
