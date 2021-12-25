@@ -19,11 +19,7 @@ namespace BatchRename
             {
                 string pattern = @"^\d+$";
                 var regex = new Regex(pattern);
-                if (regex.IsMatch(fileName))
-                {
-
-                }
-                else
+                if (regex.IsMatch(fileName) == false)
                 {
                     result = new ValidationResult(false, "Illegal characters");
                 }

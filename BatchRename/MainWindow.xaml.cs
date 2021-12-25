@@ -36,7 +36,6 @@ namespace BatchRename
             "Add Counter",
             "Change Extension",
             "New Case",
-            "Replace",
             "Trim",
         };
         BindingList<string> actionsUI = new BindingList<string>();
@@ -318,6 +317,10 @@ namespace BatchRename
         }
         private void Clear_Preset_Button_Click(object sender, RoutedEventArgs e)
         {
+            foreach (RuleUI item in presets)
+            {
+                Return_Action(item);
+            }
             presets.Clear();
         }
         private void Clear_Files_Button_Click(object sender, RoutedEventArgs e)
@@ -420,13 +423,9 @@ namespace BatchRename
             }
             arr.ResetBindings();
         }
-        private void Delete_Preset_Click(object sender, RoutedEventArgs e)
+        private void Return_Action(RuleUI rule)
         {
-            int index = presetList.SelectedIndex;
-            if (index == -1)
-                return;
-            RuleUI selected = presets.ElementAt(index);
-            switch (selected.TYPE)
+            switch (rule.TYPE)
             {
                 case "AddCounter":
                     //presetComboBox.Items.Add(new ComboBoxItem() { Content = "Add Counter" });
@@ -447,6 +446,14 @@ namespace BatchRename
                     actionsUI.Add("Change Extension");
                     break;
             }
+        }
+        private void Delete_Preset_Click(object sender, RoutedEventArgs e)
+        {
+            int index = presetList.SelectedIndex;
+            if (index == -1)
+                return;
+            RuleUI selected = presets.ElementAt(index);
+            Return_Action(selected);
             presets.RemoveAt(index);
         }
         private void Update_Preset_Click(object sender, RoutedEventArgs e)

@@ -29,7 +29,7 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="9*" />
         </Grid.RowDefinitions>
-        <ToolBarTray Grid.ColumnSpan="2" Margin="0 0 0 5">
+        <ToolBarTray Grid.ColumnSpan="2" Margin="0 0 0 5" VerticalAlignment="Center">
             <ToolBar Style="{DynamicResource MaterialDesignToolBar}" ClipToBounds="False">
                 <Button Style="{StaticResource MaterialDesignFlatDarkButton}"
                         Click="Open_Preset_Button_Click"
