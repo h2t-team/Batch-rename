@@ -719,9 +719,16 @@ namespace BatchRename
                         string replacement = parts[1].Substring(1, parts[1].Length - 2);
                         presets.Add(new ReplaceRuleUI(needles, replacement));
                         break;
-                    case "All Upper":
-                    case "All Lower":
+                    case "All Upper Case":
+                        presets.Add(new AllUpperRuleUI());
+                        actionsUI.Remove("New Case");
+                        break;
+                    case "All Lower Case":
+                        presets.Add(new AllLowerRuleUI());
+                        actionsUI.Remove("New Case");
+                        break;
                     case "Pascal Case":
+                        presets.Add(new PascalCaseRuleUI());
                         actionsUI.Remove("New Case");
                         break;
                     case "Trim":
